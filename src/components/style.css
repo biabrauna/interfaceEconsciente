@@ -1,0 +1,371 @@
+/* navbar */
+.menu-list {
+  display: flex;
+  list-style: none;
+  align-items: center;
+  gap: 20px;
+  z-index: 999;
+  background-color: #1A211A;
+}
+
+.menu-hamburguer{
+  margin-left: 50px;
+}
+
+.profile-container{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+  gap:5px;
+  width: 70%;
+  margin-left: 5vw;
+  height: 70%;
+  margin-top: 0;
+}
+.sideone{
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.nav-responsive {
+    display: flex;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    background-color: #1A211A;
+    z-index: 999;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  
+  .profile {
+  background-color: #1A211A;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  overflow: hidden;
+  position: relative;
+  }
+  
+  .profile-name p{
+    color: white;
+    font-size: 12px;
+  }
+  
+  .profile-name{
+    margin-right: 20px;
+  }
+  
+  .profile img {
+    position: relative;
+    bottom: 50%;
+    margin-left: 50%;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: translate(-50%, 50%);
+  }
+
+  .profile-info p {
+    padding-left: 20px;
+  }
+ 
+/* footer */
+
+  .nav-responsive-footer {
+    position: fixed;
+    bottom: 0;
+    height: 7vh;
+    width: 100%;
+    background-color: #1A211A;
+    padding: 10px;
+    display: flex-end;
+    z-index: 999;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .circle{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    z-index: 999;
+    background-color: #343535;
+    cursor: pointer;
+  }
+
+
+.wrapper {
+    margin-top: 40px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.wrapper div, .wrapper ul {
+    width: 50%;
+    max-width: 300px;
+}
+
+
+ul {
+    padding: 0px;
+}
+
+.titulo {
+    font-size: 20px;
+    font-weight: bold;
+    background: white;
+    padding: 10px;
+}
+
+.alternativa {
+    list-style-type: none;
+    margin-bottom: 4px;
+    padding: 10px;
+    background: #E6E6E6;
+}
+
+.alternativa:hover {
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.result {
+    font-weight: bold;
+}
+
+.pontos, .result {
+    color: white;
+}
+  .menu-list-footer {
+    display: flex;
+    list-style: none;
+    width: 100%;
+    justify-content: space-evenly;
+    padding: 0;
+  }
+  .sideone{
+    margin-top: vh;
+    width: 100%;
+  }
+  
+  .menu-list-footer li {
+    text-align: center;
+    color: white;
+  }
+ 
+  img {
+    max-width: 25%;
+    height: auto;
+  }
+  
+  .menu-hamburguer {
+    display: none; /* Hide the hamburger menu on larger screens */
+    cursor: pointer;
+  }
+  .menu-hamburguer .bar1,
+  .menu-hamburguer .bar2,
+  .menu-hamburguer .bar3 {
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    background-color: white;
+  }
+  
+  .menu-list .bar{
+    width: 70%;
+    height: 0.1rem;
+    background-color: rgb(117, 117, 117);
+    right: 0;
+    transition: 0.3s ease;
+  }
+  .menu-hamburguer div {
+    width: 25px;
+    height: 3px;
+    margin: 5px 0;
+    background-color: #1A211A;
+  }
+  
+ 
+.menu-list li {
+    color: white;
+  }
+  
+  .menu-list a {
+    text-decoration: none;
+    color: #1A211A;
+  }
+
+    .menu-hamburguer {
+      display: block;
+    }
+  
+    .menu-list {
+      flex-direction: column;
+      background-color: #1A211A;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      width: 100%;
+      max-height: 300px;
+      overflow-y: auto;
+      transition: all 0.3s ease-in-out;
+    }
+  
+    .menu-list.show {
+      display: flex;
+    }
+  
+
+  .file-upload  {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    background-color:  rgb(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+    height: auto;
+  }
+  
+  .upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    width: 100%;
+    height: auto;
+  }
+  
+  .upload-icon {
+    width: 50px;
+    height: 50px;
+  }
+  
+  /* Styling for loading text during upload */
+  .upload-icon::after {
+    content: attr(data-text);
+    display: none;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .file-input {
+    width: 100%; /* Adjust width as needed */
+    margin: 2vw;
+  }
+  
+  .file-upload:hover .upload-icon::after {
+    display: relative; /* Show loading text on hover */
+  }
+  
+  .container-image{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 0;
+    width: 100%;
+    background-color: #1A211A;
+    display: flex-end;
+    justify-content: center;
+    align-items: center;
+  }
+  .image-preview{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 0;
+    width: 100%;
+    background-color: #1A211A;
+    z-index: 999;
+    display: flex-end;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+  }
+  .image-uploader{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    top: 0;
+    width: 100%;
+    background-color: #1A211A;
+    z-index: 999;
+    display: flex-end;
+    justify-content: center;
+    align-items: center;
+  }
+  .image-uploader img{
+    max-width: 40vh;
+    height: 40vh;
+  }
+  .image-uploader p{
+    color: white;
+    margin: 20px;
+  }
+  .upload-button{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 40%; 
+    background-color: #ED9300;
+  }
+  .desafios{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 80%;
+    margin-bottom: 2vh;
+  }
+.desafio-container{
+  display: flex;
+  flex-direction: column;
+  align-self: center;
+  justify-content: center;
+  border: 1px solid #ED9300;
+  padding: 4px;
+  margin-right: 2vw;
+  margin-bottom: 2vh;
+  width: 60%;
+  height: auto;
+}
+.desafio-container p{
+  font-size: 12px;
+  text-align: left;
+}
+.sacola{
+  opacity: 0.95;
+}
+
+.caminho{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 85%;
+  height: 100%;
+  margin-top: 20vh;
+  margin-bottom: 20vh;
+  margin-left: 10vw;
+  margin-right: 4vw;
+}
+.caminho p{
+  color: white;
+  margin-left: 20px;
+  margin-right: 50px;
+  text-align: left;
+}
+

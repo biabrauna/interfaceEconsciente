@@ -1,0 +1,350 @@
+  
+.espaco{
+  width: 100%;
+  height: 20px;
+  background-color: #1A211A;
+}
+
+    .marker-label{
+      font-size: 12px;
+      margin-top: -30px;
+    }
+
+    .map{
+      margin-top: 30px;
+      margin-bottom: 30px;
+      height: 50vh;
+      width: 100vw;
+    }
+
+    .input{
+      width: 100%;
+      height: 22px;
+      border-color: #A79A9A;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+    .btn{
+      width: 100%;
+      height: 45px;
+      border-color: #EE9300;
+      background-color: #EE9300;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+    .btn:hover{
+      cursor: pointer;
+    }
+
+  .App{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+  }
+  .App-logo {
+    width: 200px; /* Adjust the width as needed */
+    height: auto; /* Maintain aspect ratio */
+  }
+
+  .container-inputs{
+    display: flex-end;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    height: 45vh;
+    background-color: #1A211A;
+  }
+
+  .container-login{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    height: 100vh;
+    width: 100vw;
+    background-image: url('./src/assets/images/login.png');
+  }
+
+  .form-login{
+    display: flex;
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    height: 50%;
+    bottom: 0;
+    background-color: #1A211A;
+    padding: 20px;
+    width: 100vw;
+  }
+
+  
+  .border-box{
+    border-radius: 8px;
+    border: 10px solid #A79A9A;
+    border-style: none;
+    width: 80%;
+    margin-left: 20px;
+    height: 25%;
+    z-index: 999;
+  }
+
+  .input{
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    border-style: none;
+    background-color: #1A211A;
+  }
+  .input:target{
+    background-color: #1A211A;
+  }
+  .btn{
+    width: 80%;
+    height: 25%;
+    border-radius: 8px;
+    border-style: none;
+    border-color: #EE9300;
+    background-color: #EE9300;
+    padding: 10px;
+  }
+.link{
+  text-decoration: none;
+  color: white;
+}
+
+.link span{
+  color: #EE9300;
+}
+
+.link:hover{
+  color: white;
+}
+
+.container-inputs-cadastro{
+  display: flex-end;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  height: 75vh;
+  background-color: #1A211A;
+}
+
+.container-cadastro{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  height: 100vh;
+  width: 100vw;
+  background-image: url('./src/assets/images/cadastro.png');
+}
+
+.form-cadastro{
+  display: flex;
+  border-top-left-radius: 50px;
+  border-top-right-radius: 50px;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  height: 50%;
+  bottom: 0;
+  background-color: #1A211A;
+  padding: 20px;
+  width: 100vw;
+}
+
+
+.border-box{
+  border-radius: 8px;
+  border: 10px solid #A79A9A;
+  border-style: none;
+  width: 80%;
+  margin-left: 20px;
+  height: 25%;
+  z-index: 999;
+}
+.menu-hamburguer{
+  margin-left: 50px;
+}
+
+.profile-container-perfil{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap:5px;
+  width: 100%;
+  margin-left: 0vw;
+  height: 100%;
+  margin-top: 0;
+}
+
+.nav-responsive {
+    display: flex;
+    width: 100%;
+    height: 70px;
+    top: 0;
+    background-color: #1A211A;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .profile-name p{
+    color: white;
+    font-size: 12px;
+  }
+  
+  .profile-name{
+    margin-right: 20px;
+  }
+  
+  .profilePic-perfil {
+   border-radius: 50%;
+   height: 20vh;
+  margin-left: 35%;
+   width: 200vw;
+  }
+
+  .image-container-perfil{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 20vh;
+    width: 100vw;
+  }
+  
+  .biografia{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    height: 20vh;
+    width: 70vw;
+    background-color: #00A335;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 50px 20px 50px 20px;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .colors table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .colors th, .colors td {
+    border: 1px solid #EE9300;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .colors th {
+    background-color: #EE9300;
+  }
+
+  .duvidas-container {
+    font-family: Arial, sans-serif;
+    color: white;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.duvidas-content {
+    padding: 20px;
+    max-width: 800px;
+    margin: 60px 20px 30px 20px;
+    background-color: #1A211A;
+}
+
+.duvidas-content h1 {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.duvidas-content ol {
+    padding-left: 20px;
+}
+
+.duvidas-content li {
+    margin-bottom: 15px;
+}
+
+.duvidas-content strong {
+    color: #EE9300;
+}
+
+.duvidas-content p {
+    margin: 5px 0 0 0;
+}
+
+.sobre-container {
+  font-family: Arial, sans-serif;
+  color: white;
+  line-height: 1.6;
+  margin: 0px;
+  padding: 0;
+  background-color: #1A211A;
+}
+
+.sobre-content {
+  padding: 20px;
+  max-width: 800px;
+  margin: 60px 20px 30px 20px;
+  background-color: #1A211A;
+}
+
+.sobre-content h1 {
+  font-size: 2rem;
+  color: #EE9300;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.sobre-content h2 {
+  font-size: 1.5rem;
+  color: #EE9300;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.sobre-content p {
+  margin-bottom: 15px;
+  text-align: justify;
+}
+
+.sobre-content p:last-child {
+  margin-bottom: 60px;
+}
+
+.reuse ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.reuse ul li {
+  margin-bottom: 10px;
+}
+
+.reuse p {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  font-weight: bold;
+  color: white;
+}
