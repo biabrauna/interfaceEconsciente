@@ -17,10 +17,9 @@ export default function Perfil(){
     const [seguindo, setSeguindo] = useState('');
     const [pontos, setPontos] = useState('');
 
-
     const getUser = async () => {
         try {
-          const usersInfoFromApi = await api.get(`/users/${id}`)
+          const usersInfoFromApi = await api.get(`https://api-register-users-rrgg-one.vercel.app/users/${id}`)
           setUsersInfo(usersInfoFromApi.data);
           
         } catch (error) {
@@ -30,7 +29,7 @@ export default function Perfil(){
 
       const getProfilePics = async () => {
         try {
-          const profilePicFromApi = await api.get('/profilePic');
+          const profilePicFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app/profilePic');
           setProfilePics(profilePicFromApi.data);
           const matchingProfilePic = profilePics.find(profilePic => profilePic.userId === id)
     
@@ -41,7 +40,7 @@ export default function Perfil(){
           }
           // biome-ignore lint/style/noUselessElse: <explanation>
           else{
-            const userFromApi = await api.get(`/users/${id}`);
+            const userFromApi = await api.get(`https://api-register-users-rrgg-one.vercel.app/users/${id}`);
             setName(userFromApi.data.name);
             setBiografia(userFromApi.data.biografia);
             setSeguidores(userFromApi.data.seguidores);

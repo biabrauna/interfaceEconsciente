@@ -9,10 +9,11 @@ export default function ImageUploader() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState(''); // 'success' ou 'error'
   const { id } = useParams();
+ 
     const handlePostarFoto = async (e) => {
       e.preventDefault();
       try{
-        await api.post('/posts', {
+        await api.post('https://api-register-users-rrgg-one.vercel.app/posts', {
         url: url,
         userId: id,
         likes: 0

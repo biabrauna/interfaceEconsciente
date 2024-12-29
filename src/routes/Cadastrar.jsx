@@ -13,7 +13,7 @@ export default function Cadastrar() {
     const [inputPassword, setInputPassword] = useState('');
     const [inputSenha2, setInputSenha2] = useState('');
     const [error, setError] = useState('');
-    const [inputBiografia, setInputBio] = useState('')
+    const [inputBiografia, setInputBio] = useState('');
 
     async function createUsers() {
       if(inputName === '' || inputEmail === '' || inputAge === '' || inputPassword === '' || inputSenha2 === '') {
@@ -22,7 +22,7 @@ export default function Cadastrar() {
 
         if (inputPassword === inputSenha2) {
           try{
-            await api.post('/auth/register', {
+            await api.post('https://api-register-users-rrgg-one.vercel.app/auth/register', {
               name: inputName,
               email: inputEmail,
               age: inputAge,

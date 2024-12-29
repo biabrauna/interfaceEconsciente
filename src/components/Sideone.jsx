@@ -12,9 +12,10 @@ export default function Sideone() {
   const display = ["none", "none", "block", "none", "none", "none","none","none"];
   const espaco = ["none", "none", "block", "none", "none", "none", "none","block", "none", "none", "none", "none", "block", "none", "none", "none", "none", "block", "none", "none", "none", "none", "block","none","none","none"]
   const [desafiosCaracol, setDesafiosCaracol] = useState([]);
+
   async function getDesafios() {
     try {
-      const DesafiosFromApi = await api.get('/desafios');
+      const DesafiosFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app/desafios');
       setDesafiosCaracol(DesafiosFromApi.data)
       setDesafios(DesafiosFromApi.data || []);
       // Inicializar o estado showDivs para todos os desafios como false

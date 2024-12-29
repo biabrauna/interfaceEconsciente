@@ -7,19 +7,18 @@ import { useParams } from "react-router-dom";
 
 export default function Navbar() {
 
-  
-
   const [profilePics, setProfilePics] = useState([]);
   const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
   const [name, setName] = useState('');
   const { id } = useParams();
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     getProfilePics();
   }, [profilePics]);
   const getProfilePics = async () => {
     try {
-      const profilePicFromApi = await api.get('/profilePic');
+      const profilePicFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app/profilePic');
       setProfilePics(profilePicFromApi.data);
       const matchingProfilePic = profilePics.find(profilePic => profilePic.userId === id)
 
@@ -30,7 +29,7 @@ export default function Navbar() {
       }
       // biome-ignore lint/style/noUselessElse: <explanation>
       else  {
-        const userFromApi = await api.get(`/users/${id}`);
+        const userFromApi = await api.get(`https://api-register-users-rrgg-one.vercel.app/users/${id}`);
         setName(userFromApi.data.name); 
       }
     } catch (error) {
