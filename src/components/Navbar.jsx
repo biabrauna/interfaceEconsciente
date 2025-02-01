@@ -18,7 +18,7 @@ export default function Navbar() {
   }, [profilePics]);
   const getProfilePics = async () => {
     try {
-      const profilePicFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app/profilePic');
+      const profilePicFromApi = await api.get('/profilePic');
       setProfilePics(profilePicFromApi.data);
       const matchingProfilePic = profilePics.find(profilePic => profilePic.userId === id)
 
@@ -29,7 +29,7 @@ export default function Navbar() {
       }
       // biome-ignore lint/style/noUselessElse: <explanation>
       else  {
-        const userFromApi = await api.get(`https://api-register-users-rrgg-one.vercel.app/users/${id}`);
+        const userFromApi = await api.get(`/users/${id}`);
         setName(userFromApi.data.name); 
       }
     } catch (error) {

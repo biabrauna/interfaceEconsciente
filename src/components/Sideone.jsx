@@ -15,7 +15,7 @@ export default function Sideone() {
 
   async function getDesafios() {
     try {
-      const DesafiosFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app/desafios');
+      const DesafiosFromApi = await api.get('/desafios');
       setDesafiosCaracol(DesafiosFromApi.data)
       setDesafios(DesafiosFromApi.data || []);
       // Inicializar o estado showDivs para todos os desafios como false

@@ -22,7 +22,7 @@ export default function Cadastrar() {
 
         if (inputPassword === inputSenha2) {
           try{
-            await api.post('https://api-register-users-rrgg-one.vercel.app/auth/register', {
+            await api.post('/auth/register', {
               name: inputName,
               email: inputEmail,
               age: inputAge,

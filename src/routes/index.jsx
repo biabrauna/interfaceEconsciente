@@ -23,7 +23,7 @@ function Login() {
       else{
           const json = JSON.stringify({email, password})
           console.log(json)
-          const response = await api.post('https://api-register-users-rrgg-one.vercel.app/auth/user',
+          const response = await api.post('/auth/user',
             json,
             {
               headers: {

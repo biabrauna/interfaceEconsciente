@@ -13,7 +13,7 @@ export default function ImageUploader() {
     const handlePostarFoto = async (e) => {
       e.preventDefault();
       try{
-        await api.post('https://api-register-users-rrgg-one.vercel.app/posts', {
+        await api.post('/posts', {
         url: url,
         userId: id,
         likes: 0

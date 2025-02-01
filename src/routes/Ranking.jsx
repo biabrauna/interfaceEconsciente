@@ -7,7 +7,7 @@ export default function Ranking(){
 
     const handleUsers = async () => {
         try {
-            const usersFromApi = await api.get('https://api-register-users-rrgg-one.vercel.app//usuarios')
+            const usersFromApi = await api.get('/usuarios')
         setUsers(usersFromApi.data)
     }   catch (error) {
         console.error(error);
