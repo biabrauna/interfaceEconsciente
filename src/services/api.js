@@ -1,12 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'https://api-register-users-tau.vercel.app/',
-    withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-    }
+    baseURL: 'https://api-register-users-tau.vercel.app/'
 })
 
 // Add a response interceptor to handle CORS errors
