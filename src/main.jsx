@@ -14,53 +14,63 @@ import MapPage from './routes/Localizacao.jsx'
 import Perfil from './routes/Perfil.jsx'
 import Ranking from './routes/Ranking.jsx'
 
+const ErrorBoundary = ({ children }) => {
+  return (
+    <div className="error-boundary">
+      {children}
+    </div>
+  );
+};
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <SplashScreen />,
-  
+    element: <ErrorBoundary><SplashScreen /></ErrorBoundary>,
   },
   {
     path: "/Login",
-    element: <Login/>,
+    element: <ErrorBoundary><Login /></ErrorBoundary>,
   },
   {
     path: "/Cadastrar",
-    element: <Cadastrar />,
+    element: <ErrorBoundary><Cadastrar /></ErrorBoundary>,
   },
   {
     path: "/Home/:id",
-    element: <Home />,
+    element: <ErrorBoundary><Home /></ErrorBoundary>,
   },
   {
     path: "/Separacao/:id",
-    element: <Separacao />,
+    element: <ErrorBoundary><Separacao /></ErrorBoundary>,
   },
   {
     path: "/Sobre/:id",
-    element: <Sobre />,
+    element: <ErrorBoundary><Sobre /></ErrorBoundary>,
   },
   {
     path: "/Duvidas/:id",
-    element: <Duvidas />,
+    element: <ErrorBoundary><Duvidas /></ErrorBoundary>,
   },
   {
     path: "/Camera/:id",
-    element: <Camera />,
+    element: <ErrorBoundary><Camera /></ErrorBoundary>,
   },
   {
     path: "/Localizacao/:id",
-    element: <MapPage />,
+    element: <ErrorBoundary><MapPage /></ErrorBoundary>,
   },
   {
     path: "/Perfil/:id",
-    element: <Perfil />,
+    element: <ErrorBoundary><Perfil /></ErrorBoundary>,
   },
   {
     path: "/Ranking/:id",
-    element: <Ranking />,
+    element: <ErrorBoundary><Ranking /></ErrorBoundary>,
   },
+  {
+    path: "*",
+    element: <ErrorBoundary><div>404 - Page Not Found</div></ErrorBoundary>,
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
