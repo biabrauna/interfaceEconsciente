@@ -24,6 +24,7 @@
       border-radius: 8px;
       font-size: 14px;
       margin-bottom: 1rem;
+      color: white;
     }
     .btn{
       width: 100%;
@@ -69,7 +70,7 @@
     justify-content: end;
     height: 100vh;
     width: 100vw;
-    background-image: url('./src/assets/images/login.png');
+    background-image: url('https://res.cloudinary.com/dnulz0tix/image/upload/v1733910598/l9vc3xw0emz8mmaxxsbm.png');
   }
 
   .form-login{
@@ -147,7 +148,7 @@
   justify-content: end;
   height: 100vh;
   width: 100vw;
-  background-image: url('./src/assets/images/cadastro.png');
+  background-image: url('https://res.cloudinary.com/dnulz0tix/image/upload/v1733910598/xialrt2nyht1h3ay4sja.png');
 }
 
 .form-cadastro{

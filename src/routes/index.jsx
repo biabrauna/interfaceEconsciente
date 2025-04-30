@@ -19,13 +19,7 @@ function Login() {
       }
       else {
         const response = await api.post('/auth/user',
-          { email, password },  // Send as object, not stringified JSON
-          {
-            headers: {
-              'Content-Type': 'application/json'
-              // Remove 'Access-Control-Allow-Origin' header
-            }
-          }
+          { email, password },
         )
         console.log(response)
         if (response.data.message === "Login realizado com sucesso") {
