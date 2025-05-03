@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/auth': {
-        target: 'https://api-register-users-tau.vercel.app',
+        target: 'https://econsciente-api-aslp.vercel.app/',
         changeOrigin: true,
         secure: false,
       }

@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'https://api-register-users-tau.vercel.app/'
+    baseURL: 'https://econsciente-api-aslp.vercel.app/',
 })
 
 // Add a response interceptor to handle CORS errors
