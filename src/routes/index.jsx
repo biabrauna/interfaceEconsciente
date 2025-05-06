@@ -22,8 +22,8 @@ function Login() {
           { email, password },
         )
         console.log(response)
-        if (response.data.message === "Login realizado com sucesso") {
-          navigate(`/Home/${response.data.userId}`)
+        if (response.data.access_token ) {
+          navigate(`/Home/${response.data.user.id}`)
         }
       }
     }
