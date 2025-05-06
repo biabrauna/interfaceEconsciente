@@ -13,7 +13,7 @@ export default function Navbar() {
             <div className="circle"><Link to={`/Home/${id}`}><li><FaHome /></li></Link></div>
             <div className="circle"><Link to={`/Camera/${id}`}><li><FaCamera /> </li></Link></div>
             <div className="circle"><Link to={`/Localizacao/${id}`}><li><FaMapMarkerAlt /></li></Link></div>
-            <div className="circle"><Link to={`/Ranking/${id}`}><li><FontAwesomeIcon icon={faTrophy} size="0.5x" /></li></Link></div>
+            <div className="circle"><Link to={`/Ranking/${id}`}><li><FontAwesomeIcon icon={faTrophy} size="xs" /></li></Link></div>
         </div>
         </div>
     );

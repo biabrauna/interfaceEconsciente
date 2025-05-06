@@ -141,7 +141,7 @@ useEffect(() => {
   </div>
     <div className="map">
       <LoadScript
-        googleMapsApiKey='AIzaSyD_A8ia44H5rEEtiC3tdZZaLB7qdPZPc8g'
+        googleMapsApiKey='AIzaSyB_cTTz6LzErqpPHKxkiFpXZncefRBZfBQ'
         libraries={["places"]}
       >
         <GoogleMap

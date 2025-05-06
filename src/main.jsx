@@ -69,8 +69,16 @@ const router = createBrowserRouter([
   },
   {
     path: "*",
-    element: <ErrorBoundary><div>404 - Page Not Found</div></ErrorBoundary>,
-  }
+    element: (
+      <ErrorBoundary>
+        <div>
+          <h2>404 - Página não encontrada</h2>
+          <p>Não encontramos o que você está procurando.</p>
+          <a href="/">Voltar para a página inicial</a>
+        </div>
+      </ErrorBoundary>
+    ),
+  }  
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
