@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'https://econsciente-api-aslp.vercel.app/',
+    baseURL: 'https://airy-charm-production.up.railway.app/',
 })
 
 // Add a response interceptor to handle CORS errors

@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/auth': {
-        target: 'https://econsciente-api-aslp.vercel.app/',
+        target: 'https://airy-charm-production.up.railway.app/',
         changeOrigin: true,
         secure: false,
       }
