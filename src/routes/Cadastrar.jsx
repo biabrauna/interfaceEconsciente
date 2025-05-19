@@ -68,7 +68,7 @@ export default function Cadastrar() {
           <div className='border-box'>
           <input className="input" type="password" placeholder="Confirme sua senha" onChange={(e) => setInputSenha2(e.target.value)} required/>
           </div>
-          <Link className="link" to="/Login"><p>Ja tem uma conta?  
+          <Link className="link" to="/"><p>Ja tem uma conta?  
           <span>  Entrar</span></p></Link>
           <button className='btn' type="submit" onClick={(e) => createUsers(e)}>Cadastrar</button>
           <p style={{color: 'red', fontSize: '12px', fontWeight: 'bold', margin: '0', padding: '0', textAlign: 'center'}}>{error}</p>

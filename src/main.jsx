@@ -25,10 +25,6 @@ const ErrorBoundary = ({ children }) => {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ErrorBoundary><SplashScreen /></ErrorBoundary>,
-  },
-  {
-    path: "/Login",
     element: <ErrorBoundary><Login /></ErrorBoundary>,
   },
   {
