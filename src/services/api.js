@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'https://airy-charm-production.up.railway.app/',
+    baseURL: 'http://localhost:3000',
     withCredentials: true,
 })
 
