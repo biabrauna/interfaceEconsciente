@@ -37,12 +37,8 @@ function Login() {
     <div className='container-login'>
       <div className="container-inputs">
         <form className='form-login'>
-          <div className='border-box'>
             <input className="input" type="text" placeholder="Digite seu e-mail" onChange={(e) => setInputEmail(e.target.value)} required />
-          </div>
-          <div className='border-box'>
             <input className="input" type="password" placeholder="Digite sua senha" onChange={(e) => setInputPassword(e.target.value)} required />
-          </div>
           <button className='btn' type="submit" onClick={(e) => handleLogin(e)}>Entrar</button>
           <Link className="link" to="/Cadastrar"><p>Ainda não tem uma conta?
             <span>  Cadastre-se</span></p></Link>
