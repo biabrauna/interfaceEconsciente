@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState, useMemo, useEffect} from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   GoogleMap,
   Marker,
@@ -8,9 +8,10 @@ import {
   DirectionsService,
   DirectionsRenderer,
 } from "@react-google-maps/api";
-import "./MapPage.css"; // Importe seu arquivo de estilo CSS
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { MapPin } from "lucide-react";
+import "./MapPage.css";
 
 const MapPage = () => {
   const [map, setMap] = useState(null);
@@ -21,29 +22,26 @@ const MapPage = () => {
   const [origin, setOrigin] = useState(null);
   const [destination, setDestination] = useState(null);
   const [response, setResponse] = useState(null);
+  const [directionsService, setDirectionsService] = useState(null);
 
   const position = {
-    lat: -27.590824, // Substitua pelas coordenadas iniciais desejadas
+    lat: -27.590824,
     lng: -48.551262,
   };
 
   const onMapLoad = (map) => setMap(map);
-
   const onLoadA = (ref) => setSearchBoxA(ref);
-
   const onLoadB = (ref) => setSearchBoxB(ref);
-  const [directionsService, setDirectionsService] = useState(null);
 
-useEffect(() => {
-  if (map) {
-    setDirectionsService(new window.google.maps.DirectionsService(map));
-  }
-}, [map]);
+  useEffect(() => {
+    if (map) {
+      setDirectionsService(new window.google.maps.DirectionsService(map));
+    }
+  }, [map]);
 
   const onPlacesChanged = (searchBox, setPoint) => {
     if (searchBox) {
       const places = searchBox.getPlaces();
-      // biome-ignore lint/complexity/useOptionalChain: <explanation>
       if (places && places[0]?.geometry?.location) {
         const location = {
           lat: places[0].geometry.location.lat(),
@@ -85,10 +83,6 @@ useEffect(() => {
         : null,
     [origin, destination]
   );
-  
-  // ...
-  
-  <DirectionsService options={directionsServiceOptions} />
 
   const directionsCallback = (res) => {
     if (res?.status === "OK") {
@@ -103,43 +97,109 @@ useEffect(() => {
     [response]
   );
 
+  const pontos = [
+    {
+      title: "Parada de Lucas",
+      address:
+        "Av. Brasil nº 13.550, em frente ao viaduto de Parada de Lucas, pista de subida",
+    },
+    {
+      title: "Ilha do Governador",
+      address:
+        "Comunidade do Dendê (Av. Paranapuan), Vila Joaniza (Estrada das Canárias), Parque Royal (Av. Gov. Chagas Freitas)",
+    },
+    { title: "Botafogo", address: "Rua General Polidoro, nº 65" },
+    {
+      title: "Penha",
+      address: "Rua Merindiba, s/nº - Próximo à Igreja da Penha",
+    },
+    { title: "Tijuca", address: "Rua Dr. Renato Rocco, 400" },
+    { title: "Bangu", address: "Rua Roque Barbosa, 348 - Vila Catiri" },
+    { title: "Campo Grande", address: "Estrada do Magarça, 1" },
+    {
+      title: "Marechal Hermes",
+      address: "Rua Comandante Magalhães de Almeida, 217",
+    },
+  ];
+
   return (
     <div>
       <Navbar />
-      <div className="texto">
-      <p>Encontre o ponto de coleta mais perto de você</p>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Parada de Lucas:</span> Av. Brasil nº 13.550, em frente ao viaduto de Parada de Lucas, pista de subida
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Ilha do Governador:</span>
-    <ul>
-      <li>Comunidade do Dendê (Av. Paranapuan)</li>
-      <li>Vila Joaniza (Estrada das Canárias)</li>
-      <li>Parque Royal (Av. Governador Chagas Freitas)</li>
-    </ul>
-  </div>
+      <div
+        style={{
+          marginTop: "10%",
+          marginBottom: "5%",
+          padding: "0rem 1rem",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <h2
+          style={{
+            fontSize: "1.875rem",
+            fontWeight: "600",
+            textAlign: "center",
+            marginBottom: "2rem",
+          }}
+        >
+          Encontre um ponto de coleta
+        </h2>
 
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Botafogo:</span> Rua General Polidoro, nº 65, Botafogo
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Penha:</span> Rua Merindiba, s/nº, Penha - próximo a Igreja da Penha
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Tijuca:</span> Rua Dr. Renato Rocco, 400, Tijuca
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Bangu:</span> Rua Roque Barbosa, 348, Vila Catiri, Bangu
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Campo Grande:</span> Estrada do Magarça, 1, Campo Grande
-  </div>
-  <div className="item">
-    <span style={{color: "#ED9300"}}>Marechal Hermes:</span> Rua Comandante Magalhães de Almeida, 217
-</div>
-  </div>
-    <div className="map">
+        <div
+          style={{
+            display: "grid",
+            gap: "1rem",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 0.3fr))",
+            margin: "0 auto",
+          }}
+        >
+          {pontos.map((point) => (
+            <div
+              key={point.title}
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                borderRadius: "1rem",
+                padding: "0.2rem 0.8rem",
+                boxShadow: "0 4px 6px rgba(0,0,0,0.3)",
+                transition: "box-shadow 0.3s ease",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <MapPin
+                  style={{ color: " #764ba2", width: "1.25rem", height: "1.25rem", marginRight: "0.5rem" }}
+                />
+                <h3
+                  style={{
+                    fontSize: "1.125rem",
+                    fontWeight: "bold",
+                    color: ' #764ba2',
+                  }}
+                >
+                  {point.title}
+                </h3>
+              </div>
+              <p style={{ fontSize: "0.875rem", color: "#000" }}>
+                {point.address}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="map">
       <LoadScript
         googleMapsApiKey='AIzaSyB_cTTz6LzErqpPHKxkiFpXZncefRBZfBQ'
         libraries={["places"]}
@@ -189,7 +249,7 @@ useEffect(() => {
         </GoogleMap>
       </LoadScript>
     </div>
-    <Footer/>
+      <Footer />
     </div>
   );
 };

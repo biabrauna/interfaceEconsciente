@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import uploadImage from '../assets/images/upload (2).png';
 import api from '../services/api';
-import { useParams } from 'react-router-dom';
 
 export default function ImageUploader() {
   const [imageUrl, setImageUrl] = useState(uploadImage);
@@ -10,14 +9,26 @@ export default function ImageUploader() {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState(''); // 'success' ou 'error'
   const [isUploading, setIsUploading] = useState(false);
-  const { id } = useParams();
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const me = await api.get('/auth/me');
+        setUserId(me.data.id);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchUser();
+  }, []);
  
   const handlePostarFoto = async (e) => {
     e.preventDefault();
     try{
       await api.post('/posts', {
       url: url,
-      userId: id,
+      userId: userId,
       likes: 0
     });
     setAlertMessage('Foto postada com sucesso! A foto irá para análise e, em breve, seus pontos serão computados.');

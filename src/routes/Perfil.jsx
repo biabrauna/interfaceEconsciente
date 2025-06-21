@@ -1,13 +1,11 @@
 /* eslint-disable no-unused-vars */
 import Footer from "../components/Footer";
 import api from "../services/api";
-import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import './style.css'
 export default function Perfil(){
     const [usersInfo, setUsersInfo] = useState([]);
-    const { id } = useParams();
     const [isMenuOpen, setIsMenuOpen] = useState("none");
     const [profilePics, setProfilePics] = useState([]);
     const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
@@ -16,12 +14,14 @@ export default function Perfil(){
     const [seguidores, setSeguidores] = useState('');
     const [seguindo, setSeguindo] = useState('');
     const [pontos, setPontos] = useState('');
+    const [userId, setUserId] = useState(null);
 
     const getUser = async () => {
         try {
-          const usersInfoFromApi = await api.get(`/users/${id}`)
+          const me = await api.get('/auth/me');
+          setUserId(me.data.id);
+          const usersInfoFromApi = await api.get(`/users/${me.data.id}`)
           setUsersInfo(usersInfoFromApi.data);
-          
         } catch (error) {
           console.error(error);
         }
@@ -29,9 +29,10 @@ export default function Perfil(){
 
       const getProfilePics = async () => {
         try {
+          if (!userId) return;
           const profilePicFromApi = await api.get('/profilePic');
           setProfilePics(profilePicFromApi.data);
-          const matchingProfilePic = profilePics.find(profilePic => profilePic.userId === id)
+          const matchingProfilePic = profilePicFromApi.data.find(profilePic => profilePic.userId === userId)
     
           if (matchingProfilePic) {
             setUrl(matchingProfilePic.url);
@@ -40,7 +41,7 @@ export default function Perfil(){
           }
           // biome-ignore lint/style/noUselessElse: <explanation>
           else{
-            const userFromApi = await api.get(`/users/${id}`);
+            const userFromApi = await api.get(`/users/${userId}`);
             setName(userFromApi.data.name);
             setBiografia(userFromApi.data.biografia);
             setSeguidores(userFromApi.data.seguidores);
@@ -61,11 +62,13 @@ export default function Perfil(){
         }
     };
 
-      // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
       useEffect(() => {
         getUser();
-        getProfilePics();
       }, []);
+
+      useEffect(() => {
+        getProfilePics();
+      }, [userId]);
 
     return(
         <div>
@@ -79,13 +82,13 @@ export default function Perfil(){
             </div>
             
         <div className="menu-list" style={{ display: isMenuOpen }}>
-          <Link  to={`/Home/${id}`}><li>Home</li></Link>
+          <Link  to="/Home"><li>Home</li></Link>
           <div className="bar" />
-          <Link  to={`/Separacao/${id}`}><li>Como Separar Residuos</li></Link>
+          <Link  to="/Separacao"><li>Como Separar Residuos</li></Link>
           <div className="bar" />
-          <Link  to={`/Sobre/${id}`}><li>Sobre o App</li></Link>
+          <Link  to="/Sobre"><li>Sobre o App</li></Link>
           <div className="bar" />
-          <Link  to={`/Duvidas/${id}`}><li>Duvidas</li></Link>
+          <Link  to="/Duvidas"><li>Duvidas</li></Link>
           <div className="bar" />
           <Link  to="/Login"><li>Sair</li></Link>
           <div className="bar" />
@@ -95,7 +98,7 @@ export default function Perfil(){
             </div>
                 <div className="profile-container-perfil">
                     <div className="image-container-perfil">
-                    <Link to={`/Perfil/${id}`}>
+                    <Link to="/Perfil">
                     <img className="profilePic-perfil" src={url} alt="logo"/>    
                     </Link> 
                     </div>

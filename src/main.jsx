@@ -32,35 +32,35 @@ const router = createBrowserRouter([
     element: <ErrorBoundary><Cadastrar /></ErrorBoundary>,
   },
   {
-    path: "/Home/:id",
+    path: "/Home",
     element: <ErrorBoundary><Home /></ErrorBoundary>,
   },
   {
-    path: "/Separacao/:id",
+    path: "/Separacao",
     element: <ErrorBoundary><Separacao /></ErrorBoundary>,
   },
   {
-    path: "/Sobre/:id",
+    path: "/Sobre",
     element: <ErrorBoundary><Sobre /></ErrorBoundary>,
   },
   {
-    path: "/Duvidas/:id",
+    path: "/Duvidas",
     element: <ErrorBoundary><Duvidas /></ErrorBoundary>,
   },
   {
-    path: "/Camera/:id",
+    path: "/Camera",
     element: <ErrorBoundary><Camera /></ErrorBoundary>,
   },
   {
-    path: "/Localizacao/:id",
+    path: "/Localizacao",
     element: <ErrorBoundary><MapPage /></ErrorBoundary>,
   },
   {
-    path: "/Perfil/:id",
+    path: "/Perfil",
     element: <ErrorBoundary><Perfil /></ErrorBoundary>,
   },
   {
-    path: "/Ranking/:id",
+    path: "/Ranking",
     element: <ErrorBoundary><Ranking /></ErrorBoundary>,
   },
   {
