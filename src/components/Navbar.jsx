@@ -52,6 +52,10 @@ export default function Navbar() {
     setIsMenuOpen((prev) => (prev === "flex" ? "none" : "flex"));
   };
 
+  function handleLogout(){
+    localStorage.removeItem('token');
+  }
+
   return (
     <div className="nav-responsive">
       {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
@@ -82,7 +86,7 @@ export default function Navbar() {
           <div className="bar" />
           <Link to="/Duvidas"><li>Dúvidas</li></Link>
           <div className="bar" />
-          <Link to="/"><li>Sair</li></Link>
+          <Link to="/" onClick={handleLogout()}><li>Sair</li></Link>
           <div className="bar" />
         </div>
       </div>
