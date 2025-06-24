@@ -24,6 +24,7 @@ function Login() {
         console.log(response)
         if (response.data.access_token) {
           localStorage.setItem('token', response.data.access_token)
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           navigate('/Home')
         }
       }
