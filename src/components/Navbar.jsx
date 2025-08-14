@@ -1,60 +1,55 @@
-/* eslint-disable react/prop-types */
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
 import './style.css';
 import api from "../services/api";
+import { useAuth } from "../hooks/useAuth";
 
 export default function Navbar() {
-  const [profilePics, setProfilePics] = useState([]);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
   const [name, setName] = useState('');
-  const [userId, setUserId] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState("none");
 
-  useEffect(() => {
-    getUser();
-  }, []);
-
-  useEffect(() => {
-    getProfilePics();
-  }, [userId]);
-
-  const getUser = async () => {
+  const getProfilePics = useCallback(async () => {
     try {
-      const me = await api.get('/auth/me');
-      setUserId(me.data.id);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getProfilePics = async () => {
-    try {
-      if (!userId) return;
+      if (!user?.id) return;
       const { data } = await api.get('/profilePic');
-      setProfilePics(data);
 
-      const matchingProfilePic = data.find((profilePic) => profilePic.userId === userId);
+      const matchingProfilePic = data.find((profilePic) => profilePic.userId === user.id);
 
       if (matchingProfilePic) {
         setUrl(matchingProfilePic.url);
         setName(matchingProfilePic.name);
       } else {
-        const userFromApi = await api.get(`/users/${userId}`);
-        setName(userFromApi.data.name); 
+        setName(user.name || 'Usuário'); 
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching profile pics:', error);
+      // Fallback to user name from context
+      setName(user.name || 'Usuário');
     }
-  };
+  }, [user]);
+
+  // Executar getProfilePics quando user mudar
+  useEffect(() => {
+    if (user) {
+      getProfilePics();
+    }
+  }, [getProfilePics, user]);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => (prev === "flex" ? "none" : "flex"));
   };
 
-  function handleLogout(){
-    localStorage.removeItem('token');
-  }
+  const handleLogout = async () => {
+    try {
+      await logout();
+      // navigate('/');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
 
   return (
     <div className="nav-responsive">
@@ -86,7 +81,7 @@ export default function Navbar() {
           <div className="bar" />
           <Link to="/Duvidas"><li>Dúvidas</li></Link>
           <div className="bar" />
-          <Link to="/" onClick={handleLogout()}><li>Sair</li></Link>
+          <button onClick={handleLogout} style={{all: 'unset', cursor: 'pointer'}}><li>Sair</li></button>
           <div className="bar" />
         </div>
       </div>

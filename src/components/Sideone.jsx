@@ -12,6 +12,10 @@ export default function Sideone() {
 
   async function getDesafios() {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return; // No token, don't make request
+      }
       const response = await api.get('/desafios');
       const data = response.data || [];
       setDesafios(data);
@@ -22,9 +26,17 @@ export default function Sideone() {
         }), {})
       );
     } catch (error) {
-      console.error(error);
+      console.error('Failed to fetch desafios:', error);
+      if (error.response?.status === 404) {
+        // API endpoint doesn't exist yet, set empty array
+        setDesafios([]);
+      }
     }
   }
+
+  useEffect(() => {
+    getDesafios();
+  }, []);
 
   const handleClick = (desafioId) => {
     setShowDivs((prev) => ({
@@ -36,10 +48,6 @@ export default function Sideone() {
   const handlePhoto = () => {
     navigate(`/Camera/${id}`);
   };
-
-  useEffect(() => {
-    getDesafios();
-  }, []);
 
   // Filtrar desafios pelo termo de busca (case-insensitive)
   const filteredDesafios = desafios.filter((desafio) =>
