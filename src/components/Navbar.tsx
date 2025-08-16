@@ -1,53 +1,31 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
-import api from "../services/api";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from '@/hooks/useAuth';
+import { useUserProfilePic } from '@/hooks/api';
+import { createApiError } from '@/utils/errorHandler';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
-  const [name, setName] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState("none");
-
-  const getProfilePics = useCallback(async () => {
-    try {
-      if (!user?.id) return;
-      const { data } = await api.get('/profilePic');
-
-      const matchingProfilePic = data.find((profilePic) => profilePic.userId === user.id);
-
-      if (matchingProfilePic) {
-        setUrl(matchingProfilePic.url);
-        setName(matchingProfilePic.name);
-      } else {
-        setName(user.name || 'Usuário'); 
-      }
-    } catch (error) {
-      console.error('Error fetching profile pics:', error);
-      // Fallback to user name from context
-      setName(user.name || 'Usuário');
-    }
-  }, [user]);
-
-  // Executar getProfilePics quando user mudar
-  useEffect(() => {
-    if (user) {
-      getProfilePics();
-    }
-  }, [getProfilePics, user]);
+  
+  // Use React Query hook to get profile picture
+  const { data: userProfilePic } = useUserProfilePic(user?.id || '');
+  
+  const profileUrl = userProfilePic?.url || 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
+  const displayName = userProfilePic?.name || user?.name || 'Usuário';
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => (prev === "flex" ? "none" : "flex"));
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     try {
       await logout();
-      // navigate('/');
+      navigate('/');
     } catch (error) {
-      console.error('Error during logout:', error);
+      createApiError(error, 'Logout from navbar');
     }
   };
 
@@ -63,12 +41,12 @@ export default function Navbar() {
       <div className="profile-container">
         <Link to="/Perfil">
           <div className="profile">
-            <img className="profilePic" src={url} alt="Foto de perfil" />
+            <img className="profilePic" src={profileUrl} alt="Foto de perfil" />
           </div>
         </Link>
 
         <div className="profile-name">
-          <p>Olá {name},</p>
+          <p>Olá {displayName},</p>
           <p>Vamos reciclar?!</p>
         </div>
 

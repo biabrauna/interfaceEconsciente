@@ -4,8 +4,9 @@ import api from "../services/api";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import './style.css'
+import { User } from "@/types";
 export default function Perfil(){
-    const [usersInfo, setUsersInfo] = useState([]);
+    const [usersInfo, setUsersInfo] = useState<User[]>([]);
     const [isMenuOpen, setIsMenuOpen] = useState("none");
     const [profilePics, setProfilePics] = useState([]);
     const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');

@@ -1,20 +1,21 @@
-import ReactDOM from 'react-dom/client'
-import './index.css'
-import Login from './routes/index.jsx'
-import Cadastrar from './routes/Cadastrar.jsx'
-import { createBrowserRouter } from 'react-router-dom'
-import { ProtectedRoute } from './components/ProtectedRoute.jsx'
-import Layout from './components/Layout.jsx'
-import Home from './routes/Home.jsx'
-import Separacao from './routes/Separacao.jsx'
-import Sobre from './routes/Sobre.jsx'
-import Duvidas from './routes/Duvidas.jsx'
-import Camera from './routes/Camera.jsx'
-import MapPage from './routes/Localizacao.jsx'
-import Perfil from './routes/Perfil.jsx'
-import Ranking from './routes/Ranking.jsx'
-import ErrorBoundary from './components/ErrorBoundary.jsx'
-import { App } from './app.jsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter } from 'react-router-dom';
+import './index.css';
+import Login from '@/routes/Login';
+import Cadastrar from '@/routes/Cadastrar';
+import Home from '@/routes/Home';
+import Separacao from '@/routes/Separacao';
+import Sobre from '@/routes/Sobre';
+import Duvidas from '@/routes/Duvidas';
+import Camera from '@/routes/Camera';
+import MapPage from '@/routes/Localizacao';
+import Perfil from '@/routes/Perfil';
+import Ranking from '@/routes/Ranking';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import Layout from '@/components/Layout';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import { App } from './app';
 
 const router = createBrowserRouter([
   {
@@ -125,4 +126,9 @@ const router = createBrowserRouter([
   }  
 ]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App router={router} />)
+const rootElement = document.getElementById('root');
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+ReactDOM.createRoot(rootElement).render(<App router={router} />);

@@ -1,44 +1,29 @@
-import api from "../services/api";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useSearchDesafios } from "@/hooks/api";
 
 export default function Sideone() {
-  const [desafios, setDesafios] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para o termo de busca
-  const [showDivs, setShowDivs] = useState({});
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDivs, setShowDivs] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
   const { id } = useParams();
-
-  async function getDesafios() {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        return; // No token, don't make request
-      }
-      const response = await api.get('/desafios');
-      const data = response.data || [];
-      setDesafios(data);
+  
+  // Use React Query hook for desafios
+  const { data: desafios = [], isLoading, error } = useSearchDesafios(searchTerm);
+  
+  // Initialize showDivs when desafios data changes
+  React.useEffect(() => {
+    if (desafios.length > 0) {
       setShowDivs(
-        data.reduce((acc, desafio) => ({
+        desafios.reduce((acc, desafio) => ({
           ...acc,
           [desafio.id]: false,
         }), {})
       );
-    } catch (error) {
-      console.error('Failed to fetch desafios:', error);
-      if (error.response?.status === 404) {
-        // API endpoint doesn't exist yet, set empty array
-        setDesafios([]);
-      }
     }
-  }
+  }, [desafios]);
 
-  useEffect(() => {
-    getDesafios();
-  }, []);
-
-  const handleClick = (desafioId) => {
+  const handleClick = (desafioId: string) => {
     setShowDivs((prev) => ({
       ...prev,
       [desafioId]: !prev[desafioId],
@@ -49,10 +34,8 @@ export default function Sideone() {
     navigate(`/Camera/${id}`);
   };
 
-  // Filtrar desafios pelo termo de busca (case-insensitive)
-  const filteredDesafios = desafios.filter((desafio) =>
-    desafio.desafios.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // No need for local filtering - useSearchDesafios handles this
+  const filteredDesafios = desafios;
 
   return (
     <div style={{
@@ -101,6 +84,12 @@ export default function Sideone() {
               border: '1px solid #ccc',
             }}
           />
+          {isLoading && (
+            <p style={{ color: '#666', marginTop: '10px' }}>Carregando desafios...</p>
+          )}
+          {error && (
+            <p style={{ color: '#e74c3c', marginTop: '10px' }}>Erro ao carregar desafios</p>
+          )}
         </div>
 
         {/* Challenges Grid */}

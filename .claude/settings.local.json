@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(mv:*)",
+      "Bash(for:*)",
+      "Bash(do mv \"$file\" \"$file%.jsx.tsx\")",
+      "Bash(done)",
+      "Bash(npm run build:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(sed:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "defaultMode": "acceptEdits"
+  }
+}

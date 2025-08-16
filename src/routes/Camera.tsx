@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import ImageUploader from "../components/image-uploader";
+import ImageUploader from "@/components/ImageUploader";
 import { useEffect } from "react";
 
 
