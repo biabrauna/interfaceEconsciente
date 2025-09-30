@@ -53,51 +53,70 @@ const Login: React.FC = () => {
 
   return (
     <div className='container-login'>
+      <div className="login-logo-container">
+        <div className="login-eco-badge">
+          <span className="eco-icon">🌱</span>
+        </div>
+        <h1 className="login-title">EconSciente</h1>
+        <p className="login-subtitle">Transformando hábitos, preservando o futuro</p>
+      </div>
+
       <div className="container-inputs">
         <form className='form-login' onSubmit={handleLogin}>
-          <input 
-            className="input" 
-            type="email" 
-            placeholder="Digite seu e-mail" 
-            value={formData.email}
-            onChange={handleInputChange('email')} 
-            disabled={isLoading}
-            required 
-          />
-          <input 
-            className="input" 
-            type="password" 
-            placeholder="Digite sua senha" 
-            value={formData.password}
-            onChange={handleInputChange('password')} 
-            disabled={isLoading}
-            required 
-          />
-          <button 
-            className='btn' 
-            type="submit" 
+          <div className="input-group">
+            <span className="input-icon">📧</span>
+            <input
+              className="input-modern"
+              type="email"
+              placeholder="Digite seu e-mail"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <div className="input-group">
+            <span className="input-icon">🔒</span>
+            <input
+              className="input-modern"
+              type="password"
+              placeholder="Digite sua senha"
+              value={formData.password}
+              onChange={handleInputChange('password')}
+              disabled={isLoading}
+              required
+            />
+          </div>
+
+          <button
+            className='btn-modern'
+            type="submit"
             disabled={isLoading}
           >
-            {isLoading ? 'Entrando...' : 'Entrar'}
+            {isLoading ? (
+              <span className="btn-loading">
+                <span className="spinner"></span>
+                Entrando...
+              </span>
+            ) : (
+              'Entrar'
+            )}
           </button>
-          <Link className="link" to="/Cadastrar">
+
+          <Link className="link-modern" to="/Cadastrar">
             <p>Ainda não tem uma conta?
-              <span> Cadastre-se</span>
+              <span className="link-highlight"> Cadastre-se</span>
             </p>
           </Link>
+
+          {displayError && (
+            <div className="error-message">
+              <span className="error-icon">⚠️</span>
+              {displayError}
+            </div>
+          )}
         </form>
-        {displayError && (
-          <p style={{ 
-            color: 'red', 
-            fontSize: '18px', 
-            fontWeight: 'bold', 
-            margin: '30px', 
-            padding: '0', 
-            textAlign: 'center' 
-          }}>
-            {displayError}
-          </p>
-        )}
       </div>
     </div>
   );

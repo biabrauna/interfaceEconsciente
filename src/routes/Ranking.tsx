@@ -29,63 +29,88 @@ export default function Ranking() {
   const sortedUsers = [...users].sort((a, b) => b.pontos - a.pontos);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%", height: "80%" }}>
+    <div className="ranking-page">
       <Navbar />
 
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        marginTop: "20vh",
-        marginLeft: "30px",
-        marginRight: "40px",
-        marginBottom: "50%"
-      }}>
-        <img
-          alt="imagem"
-          style={{ width: "160px" }}
-          src="https://res.cloudinary.com/dnulz0tix/image/upload/v1733821330/khkunz0zbgkhuhqugvqc.png"
-        />
-        <p>10 desafios de 15 no mês de novembro</p>
+      <div className="ranking-content">
+        <div className="ranking-header">
+          <img
+            alt="Troféu"
+            className="ranking-trophy"
+            src="https://res.cloudinary.com/dnulz0tix/image/upload/v1733821330/khkunz0zbgkhuhqugvqc.png"
+          />
+          <div className="ranking-progress-card">
+            <div className="progress-header">
+              <span className="progress-icon">🎯</span>
+              <span className="progress-text">Progresso Mensal</span>
+            </div>
+            <div className="progress-bar-container">
+              <div className="progress-bar" style={{ width: "66%" }}></div>
+            </div>
+            <p className="progress-label">10 de 15 desafios concluídos</p>
+          </div>
+        </div>
 
-        <div className="ranking" style={{
-          padding: "0px",
-          width: "100%",
-          height: "80vh",
-          marginLeft: "30px"
-        }}>
-          <p style={{ fontSize: "16px", fontWeight: "bold" }}>Classificações</p>
+        <div className="podium-container">
+          <h2 className="podium-title">
+            <span>🏆</span> Top 3 Guardiões do Planeta
+          </h2>
 
-          {sortedUsers.slice(0, 3).map((user, index) => (
-            <div
-              key={user.id}
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-                marginRight: "20px"
-              }}
-            >
+          <div className="podium">
+            {sortedUsers.slice(0, 3).map((user, index) => {
+              const position = index === 0 ? 1 : index === 1 ? 2 : 3;
+              const heights = { 1: '140px', 2: '110px', 3: '90px' };
+              const medals = { 1: '🥇', 2: '🥈', 3: '🥉' };
+
+              return (
+                <div
+                  key={user.id}
+                  className={`podium-item podium-${position}`}
+                  style={{ order: position === 1 ? 2 : position === 2 ? 1 : 3 }}
+                >
+                  <div className="podium-user">
+                    <div className="podium-medal">{medals[position]}</div>
+                    <div className="podium-avatar-container">
+                      <img
+                        className="podium-avatar"
+                        alt={user.name}
+                        src={`https://res.cloudinary.com/dnulz0tix/image/upload/v1733820561/${images[index] || 'placeholder.jpg'}`}
+                      />
+                    </div>
+                    <h3 className="podium-name">{user.name}</h3>
+                    <div className="podium-points">
+                      <span className="points-icon">⭐</span>
+                      <span className="points-value">{user.pontos}</span>
+                    </div>
+                  </div>
+                  <div className="podium-stand" style={{ height: heights[position] }}>
+                    <span className="podium-rank">{position}°</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="ranking-list">
+          <h3 className="ranking-list-title">
+            <span>📊</span> Ranking Completo
+          </h3>
+          {sortedUsers.slice(3).map((user, index) => (
+            <div key={user.id} className="ranking-list-item">
+              <div className="ranking-position">{index + 4}°</div>
               <img
-                style={{
-                  borderRadius: "50%",
-                  width: "70px",
-                  height: "70px"
-                }}
-                alt="imagem"
-                src={`https://res.cloudinary.com/dnulz0tix/image/upload/v1733820561/${images[index] || 'placeholder.jpg'}`}
+                className="ranking-avatar"
+                alt={user.name}
+                src={`https://res.cloudinary.com/dnulz0tix/image/upload/v1733820561/${images[index + 3] || 'placeholder.jpg'}`}
               />
-              <div style={{
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column",
-                marginLeft: "20px",
-                marginRight: "60px"
-              }}>
-                <p style={{ fontSize: "14px" }}>Nome: {user.name}</p>
-                <p style={{ fontSize: "14px" }}>Pontos: {user.pontos}</p>
+              <div className="ranking-user-info">
+                <p className="ranking-user-name">{user.name}</p>
+                <p className="ranking-user-points">
+                  <span className="points-icon-small">⭐</span>
+                  {user.pontos} pontos
+                </p>
               </div>
-              <p>{index + 1}°</p>
             </div>
           ))}
         </div>

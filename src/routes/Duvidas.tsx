@@ -4,44 +4,72 @@ import Footer from "../components/Footer";
 import "./style.css";
 
 export default function Duvidas() {
+    const faqs = [
+        {
+            icon: "📄",
+            question: "Posso reciclar papel engordurado?",
+            answer: "Não. Papéis sujos de gordura, como caixas de pizza, devem ir para o lixo orgânico ou compostagem."
+        },
+        {
+            icon: "🧼",
+            question: "Preciso lavar tudo antes de reciclar?",
+            answer: "Sim! Lave potes, garrafas e latas para evitar odores e facilitar o processo."
+        },
+        {
+            icon: "🔨",
+            question: "Vidro quebrado pode ser reciclado?",
+            answer: "Pode sim! mas embale em jornal ou caixa resistente antes de descartar."
+        },
+        {
+            icon: "♻️",
+            question: "Todo plástico é reciclável?",
+            answer: "Não. Plásticos como isopor e sacos metalizados (de salgadinhos) nem sempre são aceitos."
+        },
+        {
+            icon: "👕",
+            question: "O que fazer com roupas velhas?",
+            answer: "Se não forem doadas, leve para programas de reciclagem têxtil ou reutilize como pano, ou até mesmo personalize!"
+        },
+        {
+            icon: "🔋",
+            question: "Pilhas e baterias vão na reciclagem?",
+            answer: "Não. Elas devem ser descartadas em pontos de coleta específicos para resíduos perigosos."
+        },
+        {
+            icon: "🪞",
+            question: "Espelhos quebrados são recicláveis?",
+            answer: "Não são recicláveis. Embale bem e descarte com o lixo comum."
+        }
+    ];
+
     return (
-        <div className="duvidas-container">
+        <div className="duvidas-page">
             <Navbar />
-            <main className="duvidas-content">
-                <h2>Possíveis dúvidas sobre reciclagem:</h2>
-                <ol>
-                    <li>
-                        <strong>Posso reciclar papel engordurado?</strong>
-                        <p>Não. Papéis sujos de gordura, como caixas de pizza, devem ir para o lixo orgânico ou compostagem.</p>
-                    </li>
-                    <li>
-                        <strong>Preciso lavar tudo antes de reciclar?</strong>
-                        <p>Sim! Lave potes, garrafas e latas para evitar odores e facilitar o processo.</p>
-                    </li>
-                    <li>
-                        <strong>Vidro quebrado pode ser reciclado?</strong>
-                        <p>Pode sim! mas embale em jornal ou caixa resistente antes de descartar.</p>
-                    </li>
-                    <li>
-                        <strong>Todo plástico é reciclável?</strong>
-                        <p>Não. Plásticos como isopor e sacos metalizados (de salgadinhos) nem sempre são aceitos.</p>
-                    </li>
-                    <li>
-                        <strong>O que fazer com roupas velhas?</strong>
-                        <p>Se não forem doadas, leve para programas de reciclagem têxtil ou reutilize como pano, ou até mesmo personalize!</p>
-                    </li>
-                    <li>
-                        <strong>Pilhas e baterias vão na reciclagem?</strong>
-                        <p>Não. Elas devem ser descartadas em pontos de coleta específicos para resíduos perigosos.</p>
-                    </li>
-                    <li>
-                        <strong>Espelhos quebrados são recicláveis?</strong>
-                        <p>Não são recicláveis. Embale bem e descarte com o lixo comum.</p>
-                    </li>
-                </ol>
-                <p>
-                    Caso haja dúvidas, não exite em nos procurar! Além disso, os pontos de coleta seletiva podem ajudar com as informações!
-                </p>
+            <main className="duvidas-main">
+                <div className="duvidas-header">
+                    <div className="duvidas-icon-badge">❓</div>
+                    <h1 className="duvidas-title">Dúvidas Frequentes</h1>
+                    <p className="duvidas-subtitle">Tire suas dúvidas sobre reciclagem</p>
+                </div>
+
+                <div className="faq-container">
+                    {faqs.map((faq, index) => (
+                        <div key={index} className="faq-card">
+                            <div className="faq-question-row">
+                                <span className="faq-icon">{faq.icon}</span>
+                                <h3 className="faq-question">{faq.question}</h3>
+                            </div>
+                            <p className="faq-answer">{faq.answer}</p>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="duvidas-footer-card">
+                    <div className="footer-card-icon">💬</div>
+                    <p className="footer-card-text">
+                        Caso tenha mais dúvidas, não hesite em nos procurar! Além disso, os pontos de coleta seletiva podem ajudar com as informações!
+                    </p>
+                </div>
             </main>
             <Footer />
         </div>

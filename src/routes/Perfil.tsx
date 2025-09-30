@@ -72,7 +72,7 @@ export default function Perfil(){
       }, [userId]);
 
     return(
-        <div>
+        <div className="perfil-page">
             <div className="nav">
                 <div className="nav-responsive">
             {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
@@ -81,7 +81,7 @@ export default function Perfil(){
                 <div className="bar2" />
                 <div className="bar3" />
             </div>
-            
+
         <div className="menu-list" style={{ display: isMenuOpen }}>
           <Link  to="/Home"><li>Home</li></Link>
           <div className="bar" />
@@ -95,28 +95,76 @@ export default function Perfil(){
           <div className="bar" />
         </div>
         </div>
-            
-            </div>
-                <div className="profile-container-perfil">
-                    <div className="image-container-perfil">
-                    <Link to="/Perfil">
-                    <img className="profilePic-perfil" src={url} alt="logo"/>    
-                    </Link> 
-                    </div>
-                    <div style={{display: "flex", flexDirection: "row", alignItems: "center", gap: "5px"}}>
 
-                    {/* biome-ignore lint/a11y/useAltText: <explanation> */}
-<p>{name} </p><img style={{width: "25px", height: "25px"}} src="https://res.cloudinary.com/dnulz0tix/image/upload/v1733802264/lydf03q1ootluvobgb7c.png"/>
-                    </div>
-                    <div className="profile-info">
-                        <p>{usersInfo.seguidores} seguidores</p>
-                        <p>{usersInfo.seguindo} seguindo</p>
-                        <div className="biografia">
-                        <p>{usersInfo.biografia}</p>
+            </div>
+
+            <div className="perfil-content">
+                <div className="profile-header-card">
+                    <div className="profile-avatar-container">
+                        <div className="profile-avatar-border">
+                            <img className="profile-avatar" src={url} alt="Profile"/>
                         </div>
-                        <p>{usersInfo.pontos} pontos acumulados</p>
+                        <div className="profile-badge-verified">
+                            <img style={{width: "28px", height: "28px"}} src="https://res.cloudinary.com/dnulz0tix/image/upload/v1733802264/lydf03q1ootluvobgb7c.png" alt="Verified"/>
+                        </div>
+                    </div>
+
+                    <h2 className="profile-name">{name}</h2>
+
+                    <div className="profile-stats-grid">
+                        <div className="stat-card">
+                            <div className="stat-icon">👥</div>
+                            <div className="stat-value">{usersInfo.seguidores || 0}</div>
+                            <div className="stat-label">Seguidores</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon">🤝</div>
+                            <div className="stat-value">{usersInfo.seguindo || 0}</div>
+                            <div className="stat-label">Seguindo</div>
+                        </div>
+                        <div className="stat-card stat-card-highlight">
+                            <div className="stat-icon">⭐</div>
+                            <div className="stat-value">{usersInfo.pontos || 0}</div>
+                            <div className="stat-label">Pontos</div>
+                        </div>
                     </div>
                 </div>
+
+                <div className="profile-bio-card">
+                    <div className="bio-header">
+                        <span className="bio-icon">✨</span>
+                        <h3 className="bio-title">Sobre mim</h3>
+                    </div>
+                    <p className="bio-text">
+                        {usersInfo.biografia || "Usuário consciente fazendo a diferença! 🌱"}
+                    </p>
+                </div>
+
+                <div className="profile-achievements">
+                    <h3 className="achievements-title">
+                        <span>🏆</span> Conquistas Ecológicas
+                    </h3>
+                    <div className="achievements-grid">
+                        <div className="achievement-badge">
+                            <div className="achievement-icon">🌱</div>
+                            <div className="achievement-name">Iniciante</div>
+                        </div>
+                        <div className="achievement-badge">
+                            <div className="achievement-icon">♻️</div>
+                            <div className="achievement-name">Reciclador</div>
+                        </div>
+                        <div className="achievement-badge locked">
+                            <div className="achievement-icon">🌍</div>
+                            <div className="achievement-name">Guardião</div>
+                        </div>
+                        <div className="achievement-badge locked">
+                            <div className="achievement-icon">🌟</div>
+                            <div className="achievement-name">Lenda</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <Footer/>
         </div>
     )
