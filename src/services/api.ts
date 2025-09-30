@@ -38,13 +38,19 @@ class ApiService {
       (response: AxiosResponse) => response,
       (error) => {
         const apiError = createApiError(error, 'API Response');
-        
+
         // Handle unauthorized access
         if (apiError.status === 401) {
           localStorage.removeItem('token');
           window.location.href = '/';
         }
-        
+
+        // Handle rate limit (429)
+        if (apiError.status === 429) {
+          console.warn('⚠️ Rate limit atingido. Aguarde alguns segundos antes de tentar novamente.');
+          // Você pode adicionar uma notificação visual aqui
+        }
+
         return Promise.reject(apiError);
       }
     );

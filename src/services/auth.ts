@@ -1,16 +1,17 @@
 import api from './api';
 import { AuthResponse, LoginCredentials, RegisterData, User } from '@/types';
 import { createApiError } from '@/utils/errorHandler';
+import { useNavigate } from 'react-router-dom';
 
 export class AuthService {
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await api.post<AuthResponse>('/auth/user', credentials);
-      
+      const response = await api.post<AuthResponse>('/auth/login', credentials);
+
       if (response.data.access_token) {
         localStorage.setItem('token', response.data.access_token);
       }
-      
+
       return response.data;
     } catch (error) {
       throw createApiError(error, 'Login');
@@ -28,7 +29,7 @@ export class AuthService {
 
   static async logout(): Promise<void> {
     try {
-      await api.post('/auth/logout');
+      localStorage.removeItem('accessToken');
     } catch (error) {
       // Log error but don't throw - we still want to clear local storage
       createApiError(error, 'Logout');

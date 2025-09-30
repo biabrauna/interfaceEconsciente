@@ -30,6 +30,12 @@ const Login: React.FC = () => {
     }));
   };
 
+  useEffect(() => {
+    if (loginMutation.isSuccess) {
+      navigate('/Home');
+    }
+  }, [loginMutation.isSuccess]);
+
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError('');

@@ -103,59 +103,81 @@ const ImageUploader: React.FC = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      marginTop: '20%',
-      marginBottom: '20%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
       padding: '20px',
+      paddingTop: '90px',
+      paddingBottom: '90px',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
     }}>
       <div style={{
-        maxWidth: '600px',
-        margin: '0 auto',
-        padding: '0 20px'
+        maxWidth: '500px',
+        width: '100%',
+        margin: '0 auto'
       }}>
         <div style={{
-          background: 'rgba(255, 255, 255, 0.95)',
-          borderRadius: '20px',
-          padding: '40px',
-          boxShadow: '0 20px 40px rgba(0, 0, 0, 0.1)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
+          background: 'linear-gradient(135deg, rgba(26, 33, 26, 0.98) 0%, rgba(42, 58, 42, 0.98) 100%)',
+          borderRadius: '24px',
+          padding: '32px 24px',
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.4)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
           textAlign: 'center'
         }}>
-          
+
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: 'linear-gradient(135deg, #00A335 0%, #00d444 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            fontSize: '2.5rem',
+            boxShadow: '0 8px 24px rgba(0, 163, 53, 0.4)',
+            animation: 'pulse 2s ease-in-out infinite'
+          }}>
+            📸
+          </div>
+
           <h1 style={{
-            fontSize: window.innerWidth <= 768 ? '2rem' : '2.5rem',
+            fontSize: '2rem',
             fontWeight: '700',
-            background: 'linear-gradient(45deg, #667eea, #764ba2)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: '0 0 15px 0',
-            letterSpacing: '-0.02em'
+            color: '#ffffff',
+            margin: '0 0 8px 0',
+            letterSpacing: '-0.02em',
+            textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
           }}>
-            📸 Registrar Conquista
+            Registrar Conquista
           </h1>
-          
+
           <p style={{
-            fontSize: '1.1rem',
-            color: '#64748b',
-            margin: '0 0 30px 0',
-            fontWeight: '400',
-            lineHeight: '1.6'
+            fontSize: '1rem',
+            color: '#EE9300',
+            margin: '0 0 28px 0',
+            fontWeight: '500',
+            lineHeight: '1.5'
           }}>
-            Compartilhe sua atitude sustentável e ganhe pontos!
+            Compartilhe sua atitude sustentável!
           </p>
 
           <div style={{
             width: '100%',
-            height: '300px',
-            background: `url(${imageUrl}) center/cover`,
+            aspectRatio: '4/3',
+            maxHeight: '320px',
+            background: imageUrl === uploadImage
+              ? 'rgba(50, 52, 65, 0.6)'
+              : `url(${imageUrl}) center/cover`,
             borderRadius: '16px',
-            border: '3px dashed #e2e8f0',
+            border: imageUrl === uploadImage
+              ? '2px dashed rgba(238, 147, 0, 0.4)'
+              : '2px solid rgba(0, 163, 53, 0.4)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: '25px',
+            marginBottom: '20px',
             position: 'relative',
             overflow: 'hidden',
             transition: 'all 0.3s ease'
@@ -168,27 +190,32 @@ const ImageUploader: React.FC = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 cursor: 'pointer',
-                padding: '40px',
-                background: 'rgba(255, 255, 255, 0.9)',
+                padding: '30px',
+                background: imageUrl === uploadImage
+                  ? 'transparent'
+                  : 'rgba(0, 0, 0, 0.5)',
                 borderRadius: '12px',
                 transition: 'all 0.3s ease',
-                backdropFilter: 'blur(5px)'
+                backdropFilter: 'blur(5px)',
+                width: '100%',
+                height: '100%'
               }}
             >
               <div style={{
                 fontSize: '3rem',
-                marginBottom: '15px',
-                opacity: 0.7
+                marginBottom: '12px',
+                filter: imageUrl === uploadImage ? 'none' : 'brightness(0) invert(1)'
               }}>
-                📁
+                {imageUrl === uploadImage ? '📁' : '🔄'}
               </div>
               <span style={{
-                fontSize: '1.1rem',
+                fontSize: '1rem',
                 fontWeight: '600',
-                color: '#4f46e5',
-                textAlign: 'center'
+                color: imageUrl === uploadImage ? '#EE9300' : '#ffffff',
+                textAlign: 'center',
+                textShadow: imageUrl === uploadImage ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.5)'
               }}>
-                📂 Escolher Foto
+                {imageUrl === uploadImage ? 'Escolher Foto' : 'Trocar Foto'}
               </span>
             </label>
             <input
@@ -203,80 +230,110 @@ const ImageUploader: React.FC = () => {
           </div>
 
           <form onSubmit={handlePostarFoto}>
-            <button 
+            <button
               type="submit"
               disabled={!url || isUploading || createPostMutation.isPending}
               style={{
                 width: '100%',
-                padding: '18px 30px',
-                background: url && !isUploading 
-                  ? 'linear-gradient(45deg, #10b981, #059669)' 
-                  : 'linear-gradient(45deg, #94a3b8, #64748b)',
+                padding: '16px 24px',
+                background: url && !isUploading
+                  ? 'linear-gradient(135deg, #EE9300 0%, #ff9e00 100%)'
+                  : 'rgba(50, 52, 65, 0.8)',
                 color: 'white',
                 border: 'none',
                 borderRadius: '12px',
-                fontSize: '1.2rem',
+                fontSize: '1.1rem',
                 fontWeight: '600',
                 cursor: url && !isUploading ? 'pointer' : 'not-allowed',
                 transition: 'all 0.3s ease',
-                boxShadow: url && !isUploading 
-                  ? '0 4px 15px rgba(16, 185, 129, 0.3)' 
-                  : '0 4px 15px rgba(148, 163, 184, 0.3)',
-                opacity: url && !isUploading ? 1 : 0.6
+                boxShadow: url && !isUploading
+                  ? '0 4px 15px rgba(238, 147, 0, 0.3)'
+                  : '0 4px 15px rgba(0, 0, 0, 0.2)',
+                opacity: url && !isUploading ? 1 : 0.5,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
               } as React.CSSProperties}
               onMouseOver={(e: React.MouseEvent<HTMLButtonElement>) => {
                 if (url && !isUploading) {
                   (e.target as HTMLButtonElement).style.transform = 'translateY(-2px)';
-                  (e.target as HTMLButtonElement).style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.4)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 6px 20px rgba(238, 147, 0, 0.4)';
                 }
               }}
               onMouseOut={(e: React.MouseEvent<HTMLButtonElement>) => {
                 if (url && !isUploading) {
                   (e.target as HTMLButtonElement).style.transform = 'translateY(0)';
-                  (e.target as HTMLButtonElement).style.boxShadow = '0 4px 15px rgba(16, 185, 129, 0.3)';
+                  (e.target as HTMLButtonElement).style.boxShadow = '0 4px 15px rgba(238, 147, 0, 0.3)';
                 }
               }}
             >
-              {isUploading ? '⏳ Processando...' : '🚀 Postar Foto'}
+              {isUploading ? (
+                <>
+                  <span style={{
+                    display: 'inline-block',
+                    width: '16px',
+                    height: '16px',
+                    border: '2px solid rgba(255, 255, 255, 0.3)',
+                    borderTopColor: 'white',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite'
+                  }}></span>
+                  Processando...
+                </>
+              ) : (
+                <>🚀 Postar Foto</>
+              )}
             </button>
           </form>
 
           {alertMessage && (
-            <div 
+            <div
               key={alertMessage}
               style={{
-                marginTop: '25px',
-                padding: '18px 24px',
+                marginTop: '20px',
+                padding: '14px 18px',
                 borderRadius: '12px',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 fontWeight: '500',
                 lineHeight: '1.5',
-                background: alertType === 'success' 
-                  ? 'linear-gradient(45deg, #10b981, #059669)' 
-                  : 'linear-gradient(45deg, #ef4444, #dc2626)',
-                color: 'white',
-                boxShadow: alertType === 'success'
-                  ? '0 4px 15px rgba(16, 185, 129, 0.3)'
-                  : '0 4px 15px rgba(239, 68, 68, 0.3)',
+                background: alertType === 'success'
+                  ? 'rgba(0, 163, 53, 0.2)'
+                  : 'rgba(220, 38, 38, 0.2)',
+                color: alertType === 'success' ? '#00d444' : '#ff6b6b',
+                border: alertType === 'success'
+                  ? '1px solid rgba(0, 163, 53, 0.4)'
+                  : '1px solid rgba(220, 38, 38, 0.4)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
                 opacity: 1,
                 transform: 'translateY(0)',
                 transition: 'all 0.3s ease-out'
               } as React.CSSProperties}
             >
-              {alertType === 'success' ? '✅' : '❌'} {alertMessage}
+              <span style={{ fontSize: '1.2rem' }}>
+                {alertType === 'success' ? '✅' : '⚠️'}
+              </span>
+              <span>{alertMessage}</span>
             </div>
           )}
-          
+
           {errorMessage && (
             <div style={{
-              marginTop: '15px',
-              padding: '12px',
-              backgroundColor: '#fee2e2',
-              color: '#dc2626',
-              borderRadius: '8px',
-              fontSize: '0.9rem'
+              marginTop: '16px',
+              padding: '14px 18px',
+              background: 'rgba(220, 38, 38, 0.15)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              color: '#ff6b6b',
+              borderRadius: '12px',
+              fontSize: '0.9rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
             }}>
-              {errorMessage}
+              <span style={{ fontSize: '1.2rem' }}>⚠️</span>
+              <span>{errorMessage}</span>
             </div>
           )}
         </div>

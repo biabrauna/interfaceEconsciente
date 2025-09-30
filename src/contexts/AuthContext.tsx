@@ -3,6 +3,7 @@ import { useAuthState, useLogin, useLogout } from '@/hooks/api';
 import { LoginResult, AuthContextType } from '@/types';
 import { ValidationUtils } from '@/utils/validation';
 import { createApiError } from '@/utils/errorHandler';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -11,6 +12,7 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const navigate = useNavigate();
   const { user, isLoading, error: authError } = useAuthState();
   const loginMutation = useLogin();
   const logoutMutation = useLogout();
@@ -19,6 +21,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       ValidationUtils.validateLoginForm(email, password);
       const result = await loginMutation.mutateAsync({ email: email.trim(), password });
+      navigate('/Home');
       return result;
     } catch (error) {
       const appError = createApiError(error, 'Login');

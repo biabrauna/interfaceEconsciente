@@ -45,10 +45,31 @@ export interface ApiError {
   code?: string;
 }
 
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  total: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+  totalPages: number;
+}
+
+export interface PaginatedDesafios {
+  data: Desafios[];
+  meta: PaginationMeta;
+}
+
+export interface PaginatedUsers {
+  data: User[];
+  meta: PaginationMeta;
+}
+
 export interface Desafios {
   id: string;
   desafios: string;
   valor: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProfilePic {
@@ -112,6 +133,13 @@ export class UnauthorizedError extends AppError {
   constructor(message: string = 'Acesso não autorizado') {
     super(message, 401, 'UNAUTHORIZED');
     this.name = 'UnauthorizedError';
+  }
+}
+
+export class RateLimitError extends AppError {
+  constructor(message: string = 'Muitas requisições. Tente novamente em alguns segundos.') {
+    super(message, 429, 'RATE_LIMIT_EXCEEDED');
+    this.name = 'RateLimitError';
   }
 }
 

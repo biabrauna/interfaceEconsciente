@@ -1,13 +1,12 @@
 /* eslint-disable no-unused-vars */
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import api from "../services/api";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import './style.css'
 import { User } from "@/types";
 export default function Perfil(){
     const [usersInfo, setUsersInfo] = useState<User[]>([]);
-    const [isMenuOpen, setIsMenuOpen] = useState("none");
     const [profilePics, setProfilePics] = useState([]);
     const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
     const [name, setName] = useState('');
@@ -54,15 +53,6 @@ export default function Perfil(){
         }
       }
     
-    const toggleMenu = () => {
-        if (isMenuOpen==="flex"){
-            setIsMenuOpen("none");
-        }
-        else{
-            setIsMenuOpen("flex");
-        }
-    };
-
       useEffect(() => {
         getUser();
       }, []);
@@ -73,30 +63,7 @@ export default function Perfil(){
 
     return(
         <div className="perfil-page">
-            <div className="nav">
-                <div className="nav-responsive">
-            {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-<div className="menu-hamburguer" onClick={toggleMenu}>
-                <div className="bar1" />
-                <div className="bar2" />
-                <div className="bar3" />
-            </div>
-
-        <div className="menu-list" style={{ display: isMenuOpen }}>
-          <Link  to="/Home"><li>Home</li></Link>
-          <div className="bar" />
-          <Link  to="/Separacao"><li>Como Separar Residuos</li></Link>
-          <div className="bar" />
-          <Link  to="/Sobre"><li>Sobre o App</li></Link>
-          <div className="bar" />
-          <Link  to="/Duvidas"><li>Duvidas</li></Link>
-          <div className="bar" />
-          <Link  to="/Login"><li>Sair</li></Link>
-          <div className="bar" />
-        </div>
-        </div>
-
-            </div>
+            <Navbar />
 
             <div className="perfil-content">
                 <div className="profile-header-card">

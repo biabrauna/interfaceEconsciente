@@ -1,22 +1,34 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { queryKeys, invalidateQueries } from '@/lib/queryClient';
-import { Desafios } from '@/types';
+import { Desafios, PaginatedDesafios } from '@/types';
 import { createApiError } from '@/utils/errorHandler';
 
-// Hook to get all desafios/challenges
-export const useDesafios = () => {
+// Hook to get all desafios/challenges with pagination
+export const useDesafios = (page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: queryKeys.desafios.all,
-    queryFn: async (): Promise<Desafios[]> => {
+    queryKey: queryKeys.desafios.list(page, limit),
+    queryFn: async (): Promise<PaginatedDesafios> => {
       try {
-        const response = await api.get<Desafios[]>('/desafios');
+        const response = await api.get<PaginatedDesafios>('/desafios', {
+          params: { page, limit }
+        });
         return response.data;
       } catch (error) {
-        // If endpoint doesn't exist (404), return empty array
+        // If endpoint doesn't exist (404), return empty response
         const apiError = createApiError(error, 'Get desafios');
         if (apiError.status === 404) {
-          return [];
+          return {
+            data: [],
+            meta: {
+              page: 1,
+              limit: 10,
+              total: 0,
+              hasPreviousPage: false,
+              hasNextPage: false,
+              totalPages: 0
+            }
+          };
         }
         throw apiError;
       }
@@ -126,17 +138,18 @@ export const useDeleteDesafio = () => {
 };
 
 // Hook to get filtered/searched desafios
-export const useSearchDesafios = (searchTerm: string) => {
-  const { data: allDesafios, ...rest } = useDesafios();
-  
-  const filteredDesafios = searchTerm.trim() 
-    ? allDesafios?.filter(desafio => 
+export const useSearchDesafios = (searchTerm: string, page: number = 1, limit: number = 100) => {
+  const { data: paginatedData, ...rest } = useDesafios(page, limit);
+
+  const filteredDesafios = searchTerm.trim()
+    ? paginatedData?.data.filter(desafio =>
         desafio.desafios.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    : allDesafios;
-  
+    : paginatedData?.data;
+
   return {
-    data: filteredDesafios,
+    data: filteredDesafios || [],
+    meta: paginatedData?.meta,
     ...rest,
   };
 };

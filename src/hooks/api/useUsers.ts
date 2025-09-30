@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { queryKeys, invalidateQueries } from '@/lib/queryClient';
-import { User } from '@/types';
+import { User, PaginatedUsers } from '@/types';
 import { createApiError } from '@/utils/errorHandler';
 
 // Interface for profile picture
@@ -12,13 +12,15 @@ export interface ProfilePic {
   name: string;
 }
 
-// Hook to get all users (for ranking)
-export const useUsers = () => {
+// Hook to get all users (for ranking) with pagination
+export const useUsers = (page: number = 1, limit: number = 100) => {
   return useQuery({
-    queryKey: queryKeys.users.all,
-    queryFn: async (): Promise<User[]> => {
+    queryKey: queryKeys.users.list(page, limit),
+    queryFn: async (): Promise<PaginatedUsers> => {
       try {
-        const response = await api.get<User[]>('/users');
+        const response = await api.get<PaginatedUsers>('/usuarios', {
+          params: { page, limit }
+        });
         return response.data;
       } catch (error) {
         throw createApiError(error, 'Get all users');

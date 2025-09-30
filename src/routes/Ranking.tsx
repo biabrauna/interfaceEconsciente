@@ -1,24 +1,10 @@
-import { useEffect, useState } from "react";
-import api from "../services/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { User } from "@/types";
+import { useUsers } from "@/hooks/api/useUsers";
 
 export default function Ranking() {
-  const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    const handleUsers = async () => {
-      try {
-        const { data } = await api.get('/usuarios');
-        setUsers(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    handleUsers();
-  }, []); // Adicionado array vazio para rodar apenas uma vez
+  // Buscar todos os usuários com limite alto para ranking completo
+  const { data: paginatedUsers, isLoading, error } = useUsers(1, 100);
 
   const images = [
     "exayhaa5rngll7qs8acq.png",
@@ -26,7 +12,46 @@ export default function Ranking() {
     "fjbwpp3ooixkmnmxfljm.jpg"
   ];
 
-  const sortedUsers = [...users].sort((a, b) => b.pontos - a.pontos);
+  // Ordenar usuários por pontos (maior para menor)
+  const sortedUsers = [...(paginatedUsers?.data || [])].sort((a, b) => b.pontos - a.pontos);
+
+  if (isLoading) {
+    return (
+      <div className="ranking-page">
+        <Navbar />
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontSize: '1.2rem'
+        }}>
+          ⏳ Carregando ranking...
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="ranking-page">
+        <Navbar />
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#ff6b6b',
+          fontSize: '1.2rem'
+        }}>
+          ⚠️ Erro ao carregar ranking
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="ranking-page">

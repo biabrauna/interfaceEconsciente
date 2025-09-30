@@ -39,77 +39,123 @@ export default function Sideone() {
 
   return (
     <div style={{
-      marginTop: '20%',
-      marginBottom: '20%',
       minHeight: '100vh',
-      padding: '20px',
+      background: 'linear-gradient(135deg, #1A211A 0%, #2a3a2a 100%)',
+      paddingTop: '90px',
+      paddingBottom: '90px',
+      padding: '90px 20px',
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
     }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* Header Section */}
         <div style={{
           textAlign: 'center',
-          marginBottom: '20px',
+          marginBottom: '40px',
         }}>
-          <h1 style={{
-            fontSize: window.innerWidth <= 768 ? '2rem' : '2.5rem',
-            fontWeight: '700',
-            background: 'linear-gradient(45deg, #667eea, #764ba2)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            margin: '0 0 10px 0',
-            letterSpacing: '-0.02em',
+          <div style={{
+            width: '80px',
+            height: '80px',
+            background: 'linear-gradient(135deg, #EE9300 0%, #ff9e00 100%)',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 20px',
+            fontSize: '2.5rem',
+            boxShadow: '0 8px 24px rgba(238, 147, 0, 0.4)',
+            animation: 'pulse 2s ease-in-out infinite'
           }}>
-            🚀 Desafios
+            🚀
+          </div>
+          <h1 style={{
+            fontSize: '2.2rem',
+            fontWeight: '700',
+            color: '#ffffff',
+            margin: '0 0 12px 0',
+            textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
+          }}>
+            Desafios Ecológicos
           </h1>
           <p style={{
             fontSize: '1.1rem',
-            color: '#64748b',
+            color: '#EE9300',
+            margin: '0 0 24px 0'
           }}>
-            Escolha um desafio para postar e motivar seus amigos!
+            Escolha um desafio e faça a diferença!
           </p>
           {/* Campo de busca */}
-          <input
-            type="text"
-            placeholder="Buscar desafios..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              marginTop: '15px',
-              padding: '10px 20px',
-              width: '80%',
-              fontSize: '1rem',
-              borderRadius: '8px',
-              border: '1px solid #ccc',
-            }}
-          />
+          <div style={{
+            maxWidth: '500px',
+            margin: '0 auto',
+            position: 'relative'
+          }}>
+            <input
+              type="text"
+              placeholder="Buscar desafios..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '16px 20px',
+                fontSize: '1rem',
+                borderRadius: '12px',
+                border: '2px solid rgba(238, 147, 0, 0.3)',
+                background: 'rgba(26, 33, 26, 0.95)',
+                color: 'white',
+                outline: 'none',
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.3s ease'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#EE9300';
+                e.target.style.boxShadow = '0 4px 16px rgba(238, 147, 0, 0.4)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(238, 147, 0, 0.3)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+              }}
+            />
+          </div>
           {isLoading && (
-            <p style={{ color: '#666', marginTop: '10px' }}>Carregando desafios...</p>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', marginTop: '16px', fontSize: '0.95rem' }}>
+              ⏳ Carregando desafios...
+            </p>
           )}
           {error && (
-            <p style={{ color: '#e74c3c', marginTop: '10px' }}>Erro ao carregar desafios</p>
+            <div style={{
+              marginTop: '16px',
+              padding: '12px 16px',
+              background: 'rgba(220, 38, 38, 0.15)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              borderRadius: '10px',
+              color: '#ff6b6b',
+              fontSize: '0.9rem',
+              maxWidth: '500px',
+              margin: '16px auto 0'
+            }}>
+              ⚠️ Erro ao carregar desafios
+            </div>
           )}
         </div>
 
         {/* Challenges Grid */}
         <div style={{
           display: 'grid',
-          gap: '25px',
-          gridTemplateColumns:
-            window.innerWidth <= 768
-              ? '1fr'
-              : 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '20px',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
         }}>
           {filteredDesafios.map((desafio, index) => (
             <div key={desafio.id} style={{
-              background: 'rgba(255, 255, 255, 0.95)',
+              background: 'rgba(26, 33, 26, 0.95)',
               borderRadius: '16px',
               overflow: 'hidden',
+              border: showDivs[desafio.id]
+                ? '2px solid #00A335'
+                : '1px solid rgba(255, 255, 255, 0.1)',
               boxShadow: showDivs[desafio.id]
-                ? '0 25px 50px rgba(0, 0, 0, 0.15)'
-                : '0 10px 30px rgba(0, 0, 0, 0.08)',
-              transition: 'all 0.3s',
+                ? '0 8px 30px rgba(0, 163, 53, 0.3)'
+                : '0 4px 20px rgba(0, 0, 0, 0.3)',
+              transition: 'all 0.3s ease',
             }}>
               {/* Header clicável */}
               <div
@@ -118,33 +164,103 @@ export default function Sideone() {
                   padding: '20px',
                   cursor: 'pointer',
                   background: showDivs[desafio.id]
-                    ? 'linear-gradient(135deg, #667eea, #764ba2)'
-                    : 'linear-gradient(135deg, #f8fafc, #e2e8f0)',
+                    ? 'linear-gradient(135deg, #00A335 0%, #00d444 100%)'
+                    : 'rgba(50, 52, 65, 0.6)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  if (!showDivs[desafio.id]) {
+                    e.currentTarget.style.background = 'rgba(50, 52, 65, 0.8)';
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!showDivs[desafio.id]) {
+                    e.currentTarget.style.background = 'rgba(50, 52, 65, 0.6)';
+                  }
                 }}
               >
                 <h3 style={{
                   margin: 0,
-                  color: showDivs[desafio.id] ? '#fff' : '#1e293b',
+                  color: '#ffffff',
+                  fontSize: '1.2rem',
+                  fontWeight: '600'
                 }}>
-                  Desafio - {index + 1}
+                  🎯 Desafio #{index + 1}
                 </h3>
+                <span style={{
+                  fontSize: '1.5rem',
+                  transform: showDivs[desafio.id] ? 'rotate(180deg)' : 'rotate(0)',
+                  transition: 'transform 0.3s ease'
+                }}>
+                  ▼
+                </span>
               </div>
 
               {/* Detalhes */}
               {showDivs[desafio.id] && (
-                <div style={{ padding: '20px', color: '#000' }}>
-                  <p>{desafio.desafios}</p>
-                  <div style={{ margin: '10px 0' }}>
-                    <strong>Pontos:</strong> {desafio.valor}
-                  </div>
-                  <button onClick={handlePhoto} style={{
-                    padding: '10px 20px',
-                    border: 'none',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(45deg, #10b981, #059669)',
-                    color: '#fff',
-                    cursor: 'pointer',
+                <div style={{
+                  padding: '24px',
+                  background: 'rgba(50, 52, 65, 0.4)',
+                  animation: 'slideDown 0.3s ease-out'
+                }}>
+                  <p style={{
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    fontSize: '1rem',
+                    lineHeight: '1.6',
+                    margin: '0 0 16px 0'
                   }}>
+                    {desafio.desafios}
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '12px',
+                    background: 'rgba(238, 147, 0, 0.15)',
+                    borderRadius: '10px',
+                    border: '1px solid rgba(238, 147, 0, 0.3)',
+                    marginBottom: '16px'
+                  }}>
+                    <span style={{ fontSize: '1.5rem' }}>⭐</span>
+                    <span style={{
+                      color: '#EE9300',
+                      fontWeight: '600',
+                      fontSize: '1.1rem'
+                    }}>
+                      {desafio.valor} pontos
+                    </span>
+                  </div>
+                  <button
+                    onClick={handlePhoto}
+                    style={{
+                      width: '100%',
+                      padding: '14px 24px',
+                      border: 'none',
+                      borderRadius: '12px',
+                      background: 'linear-gradient(135deg, #00A335 0%, #00d444 100%)',
+                      color: '#fff',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      boxShadow: '0 4px 15px rgba(0, 163, 53, 0.3)',
+                      transition: 'all 0.3s ease',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 163, 53, 0.4)';
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 163, 53, 0.3)';
+                    }}
+                  >
                     📸 Postar Desafio
                   </button>
                 </div>

@@ -35,12 +35,14 @@ export const queryKeys = {
   },
   users: {
     all: ['users'] as const,
+    list: (page: number, limit: number) => ['users', 'list', page, limit] as const,
     detail: (id: string) => ['users', id] as const,
     profile: (userId: string) => ['users', userId, 'profile'] as const,
     profilePics: () => ['users', 'profilePics'] as const,
   },
   desafios: {
     all: ['desafios'] as const,
+    list: (page: number, limit: number) => ['desafios', 'list', page, limit] as const,
     detail: (id: string) => ['desafios', id] as const,
   },
   posts: {
