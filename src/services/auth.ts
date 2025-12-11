@@ -6,14 +6,27 @@ import { useNavigate } from 'react-router-dom';
 export class AuthService {
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
+      console.log('[AuthService] Iniciando login...');
       const response = await api.post<AuthResponse>('/auth/login', credentials);
 
       if (response.data.access_token) {
+        console.log('[AuthService] Token recebido, salvando no localStorage...');
         localStorage.setItem('token', response.data.access_token);
+
+        // Verificar se foi salvo corretamente
+        const savedToken = localStorage.getItem('token');
+        console.log('[AuthService] Token salvo:', {
+          saved: !!savedToken,
+          matches: savedToken === response.data.access_token,
+          tokenPreview: savedToken ? `${savedToken.substring(0, 20)}...` : 'none'
+        });
+      } else {
+        console.warn('[AuthService] Nenhum token recebido no response');
       }
 
       return response.data;
     } catch (error) {
+      console.error('[AuthService] Erro no login:', error);
       throw createApiError(error, 'Login');
     }
   }

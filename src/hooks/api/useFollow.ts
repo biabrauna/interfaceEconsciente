@@ -22,7 +22,11 @@ export function useFollowUser() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myFollowing });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.followers(userId) });
-      queryClient.invalidateQueries({ queryKey: ['users'] }); // Invalida cache de usuários para atualizar contadores
+
+      // Invalida queries de usuários de forma mais específica
+      queryClient.invalidateQueries({ queryKey: ['users'] }); // Lista geral
+      queryClient.invalidateQueries({ queryKey: ['users', userId] }); // Usuário específico sendo seguido
+      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] }); // Endpoint correto do backend
     },
     onError: (error) => {
       console.error('Erro ao seguir usuário:', error);
@@ -43,7 +47,11 @@ export function useUnfollowUser() {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myFollowing });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.followers(userId) });
-      queryClient.invalidateQueries({ queryKey: ['users'] }); // Invalida cache de usuários para atualizar contadores
+
+      // Invalida queries de usuários de forma mais específica
+      queryClient.invalidateQueries({ queryKey: ['users'] }); // Lista geral
+      queryClient.invalidateQueries({ queryKey: ['users', userId] }); // Usuário específico
+      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] }); // Endpoint correto do backend
     },
     onError: (error) => {
       console.error('Erro ao deixar de seguir usuário:', error);

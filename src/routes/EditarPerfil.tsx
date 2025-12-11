@@ -61,8 +61,7 @@ export default function EditarPerfil() {
 
       setTimeout(() => {
         if (fromOnboarding === 'true') {
-          // Limpar flag e voltar para Home onde o onboarding irá continuar
-          sessionStorage.removeItem('from_onboarding');
+          // Não remove from_onboarding aqui, deixa o Onboarding fazer isso
           navigate('/Home');
         } else {
           navigate('/Perfil');

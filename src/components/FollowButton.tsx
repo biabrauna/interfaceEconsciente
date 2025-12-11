@@ -12,6 +12,9 @@ export default function FollowButton({ userId, onFollowChange }: FollowButtonPro
   const unfollowMutation = useUnfollowUser();
 
   const handleClick = async () => {
+    // Previne cliques duplos enquanto a requisição está em andamento
+    if (isPending) return;
+
     try {
       if (isFollowing) {
         await unfollowMutation.mutateAsync(userId);

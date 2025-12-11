@@ -28,23 +28,33 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: async (credentials: LoginCredentials): Promise<LoginResult> => {
       try {
+        console.log('[useLogin] Chamando AuthService.login...');
         const authResponse = await AuthService.login(credentials);
+        console.log('[useLogin] AuthService.login completado:', {
+          hasUser: !!authResponse.user,
+          hasToken: !!authResponse.access_token
+        });
         return { success: true, user: authResponse.user };
       } catch (error) {
+        console.error('[useLogin] Erro na mutação:', error);
         const apiError = createApiError(error, 'Login');
         return { success: false, error: apiError.message };
       }
     },
     onSuccess: (result) => {
+      console.log('[useLogin] onSuccess chamado:', { success: result.success });
       if (result.success && result.user) {
         // Set user data in cache
+        console.log('[useLogin] Definindo usuário no cache do React Query...');
         queryClient.setQueryData(queryKeys.auth.me, result.user);
         // Invalidate any other auth-related queries
+        console.log('[useLogin] Invalidando queries relacionadas à auth...');
         invalidateQueries.auth();
+        console.log('[useLogin] Processo onSuccess completo');
       }
     },
     onError: (error) => {
-      console.error('Login mutation failed:', error);
+      console.error('[useLogin] Login mutation failed:', error);
     },
   });
 };

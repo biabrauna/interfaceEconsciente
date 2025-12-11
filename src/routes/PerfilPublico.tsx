@@ -157,7 +157,16 @@ export default function PerfilPublico() {
           {/* Botão de seguir/deixar de seguir */}
           {currentUserId && currentUserId !== userId && (
             <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-              <FollowButton userId={userId!} />
+              <FollowButton
+                userId={userId!}
+                onFollowChange={(isFollowing) => {
+                  // Atualiza contadores localmente para feedback imediato
+                  setUserInfo(prev => prev ? {
+                    ...prev,
+                    seguidores: isFollowing ? prev.seguidores + 1 : prev.seguidores - 1
+                  } : null);
+                }}
+              />
             </div>
           )}
 

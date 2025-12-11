@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { createApiError } from '@/utils/errorHandler';
 import { ApiResponse } from '@/types';
 
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
 class ApiService {
   private api: AxiosInstance;
@@ -25,6 +25,13 @@ class ApiService {
     this.api.interceptors.request.use(
       (config) => {
         const token = localStorage.getItem('token');
+        console.log('[API Interceptor] Request:', {
+          url: config.url,
+          method: config.method,
+          hasToken: !!token,
+          tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+        });
+
         if (token) {
           config.headers.Authorization = `Bearer ${token}`;
         }

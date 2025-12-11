@@ -46,14 +46,35 @@ const Login: React.FC = () => {
     try {
       ValidationUtils.validateLoginForm(formData.email, formData.password);
 
-      await loginMutation.mutateAsync({
+      console.log('[Login] Iniciando processo de login...');
+      const result = await loginMutation.mutateAsync({
         email: formData.email.trim(),
         password: formData.password
       });
 
-      // Redirecionamento será feito após verificação de autenticação
+      console.log('[Login] Login mutação completada:', { success: result.success });
+
+      // Aguardar um momento para garantir que o token está no localStorage
+      // e que o React Query processou o onSuccess
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verificar se o token está realmente no localStorage
+      const token = localStorage.getItem('token');
+      console.log('[Login] Verificando token antes de navegar:', {
+        hasToken: !!token,
+        tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
+      });
+
+      if (!token) {
+        console.error('[Login] Token não encontrado no localStorage após login!');
+        setError('Erro ao processar autenticação. Tente novamente.');
+        return;
+      }
+
+      console.log('[Login] Navegando para /Home...');
       navigate('/Home');
     } catch (error) {
+      console.error('[Login] Erro no processo de login:', error);
       const appError = createApiError(error, 'Login form submission');
       setError(appError.message);
     }

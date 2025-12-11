@@ -36,7 +36,7 @@ export const useUser = (userId: string) => {
     queryKey: queryKeys.users.detail(userId),
     queryFn: async (): Promise<User> => {
       try {
-        const response = await api.get<User>(`/users/${userId}`);
+        const response = await api.get<User>(`/usuarios/${userId}`);
         return response.data;
       } catch (error) {
         throw createApiError(error, `Get user ${userId}`);
@@ -49,17 +49,28 @@ export const useUser = (userId: string) => {
 
 // Hook to get user profile pictures
 export const useProfilePics = () => {
+  const hasToken = !!localStorage.getItem('token');
+
+  console.log('[useProfilePics] Hook executado:', {
+    hasToken,
+    enabled: hasToken
+  });
+
   return useQuery({
     queryKey: queryKeys.users.profilePics(),
 
     queryFn: async (): Promise<ProfilePic[]> => {
+      console.log('[useProfilePics] QueryFn executada');
       try {
-        const response = await api.get<ProfilePic[]>('/profilePic');
+        const response = await api.get<ProfilePic[]>('/profile-pic');
+        console.log('[useProfilePics] Resposta recebida:', { count: response.data?.length });
         return response.data;
       } catch (error) {
+        console.error('[useProfilePics] Erro ao buscar fotos de perfil:', error);
         throw createApiError(error, 'Get profile pictures');
       }
     },
+    enabled: hasToken, // Só executa se tiver token
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
@@ -103,7 +114,7 @@ export const useUpdateUser = () => {
   return useMutation({
     mutationFn: async (userData: Partial<User> & { id: string }): Promise<User> => {
       try {
-        const response = await api.put<User>(`/users/${userData.id}`, userData);
+        const response = await api.put<User>(`/usuarios/${userData.id}`, userData);
         return response.data;
       } catch (error) {
         throw createApiError(error, 'Update user profile');
@@ -132,7 +143,7 @@ export const useUploadProfilePic = () => {
   return useMutation({
     mutationFn: async (data: { userId: string; url: string; name: string }): Promise<ProfilePic> => {
       try {
-        const response = await api.post<ProfilePic>('/profilePic', data);
+        const response = await api.post<ProfilePic>('/profile-pic', data);
         return response.data;
       } catch (error) {
         throw createApiError(error, 'Upload profile picture');
@@ -157,7 +168,7 @@ export const useDeleteProfilePic = () => {
   return useMutation({
     mutationFn: async (profilePicId: string): Promise<void> => {
       try {
-        await api.delete(`/profilePic/${profilePicId}`);
+        await api.delete(`/profile-pic/${profilePicId}`);
       } catch (error) {
         throw createApiError(error, 'Delete profile picture');
       }

@@ -6,15 +6,27 @@ import { createApiError } from '@/utils/errorHandler';
 
 // Hook to get all desafios/challenges with pagination
 export const useDesafios = (page: number = 1, limit: number = 10) => {
+  const hasToken = !!localStorage.getItem('token');
+
+  console.log('[useDesafios] Hook executado:', {
+    hasToken,
+    enabled: hasToken,
+    page,
+    limit
+  });
+
   return useQuery({
     queryKey: queryKeys.desafios.list(page, limit),
     queryFn: async (): Promise<PaginatedDesafios> => {
+      console.log('[useDesafios] QueryFn executada');
       try {
         const response = await api.get<PaginatedDesafios>('/desafios', {
           params: { page, limit }
         });
+        console.log('[useDesafios] Resposta recebida:', { count: response.data?.data?.length });
         return response.data;
       } catch (error) {
+        console.error('[useDesafios] Erro ao buscar desafios:', error);
         // If endpoint doesn't exist (404), return empty response
         const apiError = createApiError(error, 'Get desafios');
         if (apiError.status === 404) {
@@ -33,6 +45,7 @@ export const useDesafios = (page: number = 1, limit: number = 10) => {
         throw apiError;
       }
     },
+    enabled: hasToken, // Só executa se tiver token
     staleTime: 10 * 60 * 1000, // 10 minutes - challenges don't change often
     gcTime: 30 * 60 * 1000, // 30 minutes
   });
