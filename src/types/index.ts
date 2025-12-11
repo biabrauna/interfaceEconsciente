@@ -3,7 +3,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  age: number;
+  dataNascimento: string;
   biografia?: string;
   pontos: number;
   seguidores: number;
@@ -21,7 +21,7 @@ export interface LoginCredentials {
 export interface RegisterData {
   name: string;
   email: string;
-  age: string;
+  dataNascimento: string;
   password: string;
   confirmPassword: string;
   biografia?: string;
@@ -156,7 +156,7 @@ export interface LoginFormData {
 export interface RegisterFormData {
   name: string;
   email: string;
-  age: string;
+  dataNascimento: string;
   password: string;
   confirmPassword: string;
   biografia: string;

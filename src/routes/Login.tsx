@@ -2,18 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
 import { useLogin } from '@/hooks/api';
+import { useAuth } from '@/hooks/useAuth';
 import { LoginFormData } from '@/types';
 import { ValidationUtils } from '@/utils/validation';
 import { createApiError } from '@/utils/errorHandler';
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
   const loginMutation = useLogin();
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: ''
   });
   const [error, setError] = useState('');
+
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/Home', { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (error || loginMutation.error) {
@@ -30,23 +39,19 @@ const Login: React.FC = () => {
     }));
   };
 
-  useEffect(() => {
-    if (loginMutation.isSuccess) {
-      navigate('/Home');
-    }
-  }, [loginMutation.isSuccess]);
-
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setError('');
-    
+
     try {
       ValidationUtils.validateLoginForm(formData.email, formData.password);
-      
-      const result = await loginMutation.mutateAsync({
+
+      await loginMutation.mutateAsync({
         email: formData.email.trim(),
         password: formData.password
       });
+
+      // Redirecionamento será feito após verificação de autenticação
       navigate('/Home');
     } catch (error) {
       const appError = createApiError(error, 'Login form submission');

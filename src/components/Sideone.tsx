@@ -1,17 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSearchDesafios } from "@/hooks/api";
+import EmptyState from "./EmptyState";
+import { showToast } from "@/lib/toast";
 
 export default function Sideone() {
+  const [inputValue, setInputValue] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDivs, setShowDivs] = useState<Record<string, boolean>>({});
   const navigate = useNavigate();
   const { id } = useParams();
-  
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSearchTerm(inputValue);
+  };
+
   // Use React Query hook for desafios
-  const { data: desafios = [], isLoading, error } = useSearchDesafios(searchTerm);
-  
-  // Initialize showDivs when desafios data changes
+  const { data: desafios, isLoading, error } = useSearchDesafios(searchTerm);
+
+  // Memoize desafios IDs to prevent infinite loop
+  const desafiosIds = useMemo(() =>
+    desafios.map(d => d.id).join(','),
+    [desafios]
+  );
+
+  // Initialize showDivs when desafios IDs change
   React.useEffect(() => {
     if (desafios.length > 0) {
       setShowDivs(
@@ -21,7 +35,7 @@ export default function Sideone() {
         }), {})
       );
     }
-  }, [desafios]);
+  }, [desafiosIds]);
 
   const handleClick = (desafioId: string) => {
     setShowDivs((prev) => ({
@@ -30,9 +44,16 @@ export default function Sideone() {
     }));
   };
 
-  const handlePhoto = () => {
-    navigate(`/Camera/${id}`);
+  const handlePhoto = (desafioId: string) => {
+    navigate(`/Camera/${desafioId}`);
   };
+
+  // Show toast on error
+  React.useEffect(() => {
+    if (error) {
+      showToast.error('Erro ao carregar desafios. Tente novamente.');
+    }
+  }, [error]);
 
   // No need for local filtering - useSearchDesafios handles this
   const filteredDesafios = desafios;
@@ -84,18 +105,23 @@ export default function Sideone() {
             Escolha um desafio e faça a diferença!
           </p>
           {/* Campo de busca */}
-          <div style={{
-            maxWidth: '500px',
-            margin: '0 auto',
-            position: 'relative'
-          }}>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              maxWidth: '500px',
+              margin: '0 auto',
+              position: 'relative',
+              display: 'flex',
+              gap: '8px'
+            }}
+          >
             <input
               type="text"
               placeholder="Buscar desafios..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
               style={{
-                width: '100%',
+                flex: 1,
                 padding: '16px 20px',
                 fontSize: '1rem',
                 borderRadius: '12px',
@@ -115,7 +141,33 @@ export default function Sideone() {
                 e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
               }}
             />
-          </div>
+            <button
+              type="submit"
+              style={{
+                padding: '16px 24px',
+                fontSize: '1rem',
+                borderRadius: '12px',
+                border: 'none',
+                background: 'linear-gradient(135deg, #EE9300 0%, #ff9e00 100%)',
+                color: 'white',
+                fontWeight: '600',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(238, 147, 0, 0.3)',
+                transition: 'all 0.3s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 6px 16px rgba(238, 147, 0, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(238, 147, 0, 0.3)';
+              }}
+            >
+              🔍 Buscar
+            </button>
+          </form>
           {isLoading && (
             <p style={{ color: 'rgba(255, 255, 255, 0.7)', marginTop: '16px', fontSize: '0.95rem' }}>
               ⏳ Carregando desafios...
@@ -139,12 +191,21 @@ export default function Sideone() {
         </div>
 
         {/* Challenges Grid */}
-        <div style={{
-          display: 'grid',
-          gap: '20px',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        }}>
-          {filteredDesafios.map((desafio, index) => (
+        {!isLoading && !error && filteredDesafios.length === 0 ? (
+          <EmptyState
+            icon="🎯"
+            title="Nenhum desafio encontrado"
+            description={searchTerm ? `Nenhum desafio corresponde a "${searchTerm}". Tente outro termo de busca.` : "Não há desafios disponíveis no momento."}
+            actionLabel={searchTerm ? "Limpar busca" : undefined}
+            onAction={searchTerm ? () => { setSearchTerm(''); setInputValue(''); } : undefined}
+          />
+        ) : (
+          <div style={{
+            display: 'grid',
+            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+          }}>
+            {filteredDesafios.map((desafio, index) => (
             <div key={desafio.id} style={{
               background: 'rgba(26, 33, 26, 0.95)',
               borderRadius: '16px',
@@ -234,7 +295,7 @@ export default function Sideone() {
                     </span>
                   </div>
                   <button
-                    onClick={handlePhoto}
+                    onClick={() => handlePhoto(desafio.id)}
                     style={{
                       width: '100%',
                       padding: '14px 24px',
@@ -266,8 +327,9 @@ export default function Sideone() {
                 </div>
               )}
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

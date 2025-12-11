@@ -31,9 +31,17 @@ export class ValidationUtils {
     };
   }
 
-  static validateAge(age: string): boolean {
-    const ageNum = parseInt(age, 10);
-    return !isNaN(ageNum) && ageNum >= 13 && ageNum <= 120;
+  static validateBirthDate(dataNascimento: string): boolean {
+    const birthDate = new Date(dataNascimento);
+    const today = new Date();
+
+    // Calcular idade
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+    const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+    return !isNaN(birthDate.getTime()) && actualAge >= 13 && actualAge <= 120;
   }
 
   static validateName(name: string): boolean {
@@ -58,13 +66,13 @@ export class ValidationUtils {
   static validateRegisterForm(data: {
     name: string;
     email: string;
-    age: string;
+    dataNascimento: string;
     password: string;
     confirmPassword: string;
   }): void {
     this.validateRequired(data.name, 'Nome');
     this.validateRequired(data.email, 'E-mail');
-    this.validateRequired(data.age, 'Idade');
+    this.validateRequired(data.dataNascimento, 'Data de nascimento');
     this.validateRequired(data.password, 'Senha');
     this.validateRequired(data.confirmPassword, 'Confirmação de senha');
 
@@ -76,8 +84,8 @@ export class ValidationUtils {
       throw new ValidationError('Digite um e-mail válido');
     }
 
-    if (!this.validateAge(data.age)) {
-      throw new ValidationError('Idade deve ser um número entre 13 e 120 anos');
+    if (!this.validateBirthDate(data.dataNascimento)) {
+      throw new ValidationError('Você deve ter entre 13 e 120 anos para se cadastrar');
     }
 
     const passwordValidation = this.validatePassword(data.password);

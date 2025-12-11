@@ -1104,6 +1104,7 @@
 
 .podium {
   display: flex;
+  flex-direction: row; /* Garantir horizontal em todos os tamanhos */
   align-items: flex-end;
   justify-content: center;
   gap: 0.8rem;
@@ -1116,6 +1117,11 @@
   align-items: center;
   flex: 1;
   animation: slideUp 0.6s ease-out;
+  transition: transform 0.2s ease;
+}
+
+.podium-item:hover {
+  transform: translateY(-5px);
 }
 
 .podium-user {
@@ -1300,6 +1306,132 @@
 
 .points-icon-small {
   font-size: 0.9rem;
+}
+
+/* Ranking Mobile Responsive */
+@media (max-width: 768px) {
+  .ranking-trophy {
+    width: 80px;
+  }
+
+  .ranking-progress-card {
+    max-width: 100%;
+  }
+
+  .podium {
+    flex-direction: row; /* GARANTIR horizontal no mobile */
+    gap: 0.4rem;
+  }
+
+  .podium-medal {
+    font-size: 1.8rem;
+  }
+
+  .podium-avatar-container {
+    width: 50px;
+    height: 50px;
+  }
+
+  .podium-name {
+    font-size: 0.75rem;
+    max-width: 60px;
+  }
+
+  .podium-points {
+    font-size: 0.75rem;
+  }
+
+  .points-icon {
+    font-size: 0.85rem;
+  }
+
+  .podium-rank {
+    font-size: 1.5rem;
+  }
+
+  .ranking-position {
+    font-size: 1rem;
+    min-width: 30px;
+  }
+
+  .ranking-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .ranking-user-name {
+    font-size: 0.9rem;
+  }
+
+  .ranking-user-points {
+    font-size: 0.8rem;
+  }
+
+  .ranking-list-item {
+    gap: 0.7rem;
+    padding: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .podium-container {
+    padding: 1rem;
+  }
+
+  .podium {
+    flex-direction: row !important; /* FORÇAR horizontal em telas pequenas */
+    gap: 0.3rem;
+  }
+
+  .podium-medal {
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .podium-avatar-container {
+    width: 45px;
+    height: 45px;
+  }
+
+  .podium-name {
+    font-size: 0.7rem;
+    max-width: 50px;
+  }
+
+  .podium-points {
+    font-size: 0.7rem;
+  }
+
+  .podium-rank {
+    font-size: 1.2rem;
+  }
+
+  .ranking-list {
+    padding: 1rem;
+  }
+
+  .ranking-list-item {
+    gap: 0.5rem;
+    padding: 0.7rem;
+  }
+
+  .ranking-position {
+    font-size: 0.9rem;
+    min-width: 25px;
+  }
+
+  .ranking-avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .ranking-user-name {
+    font-size: 0.85rem;
+  }
+
+  .ranking-user-points {
+    font-size: 0.75rem;
+  }
 }
 
 /* Dúvidas Styles */

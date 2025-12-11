@@ -21,7 +21,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       ValidationUtils.validateLoginForm(email, password);
       const result = await loginMutation.mutateAsync({ email: email.trim(), password });
-      navigate('/Home');
       return result;
     } catch (error) {
       const appError = createApiError(error, 'Login');

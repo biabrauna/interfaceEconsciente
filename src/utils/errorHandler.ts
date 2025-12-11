@@ -57,6 +57,14 @@ export class ErrorHandler {
   }
 
   static logError(error: AppError, context?: string): void {
+    // Silenciar erros esperados que não precisam aparecer no console
+    const silentContexts = ['Query retry check'];
+    const silentStatuses = []; // Podemos adicionar status codes aqui se necessário
+
+    if (silentContexts.includes(context || '') || silentStatuses.includes(error.status)) {
+      return;
+    }
+
     const errorInfo = {
       message: error.message,
       status: error.status,

@@ -1,8 +1,13 @@
+import { useState, useMemo } from 'react';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUsers } from "@/hooks/api/useUsers";
+import { useNavigate } from "react-router-dom";
 
 export default function Ranking() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
+
   // Buscar todos os usuários com limite alto para ranking completo
   const { data: paginatedUsers, isLoading, error } = useUsers(1, 100);
 
@@ -12,8 +17,21 @@ export default function Ranking() {
     "fjbwpp3ooixkmnmxfljm.jpg"
   ];
 
-  // Ordenar usuários por pontos (maior para menor)
-  const sortedUsers = [...(paginatedUsers?.data || [])].sort((a, b) => b.pontos - a.pontos);
+  // Filtrar e ordenar usuários
+  const sortedUsers = useMemo(() => {
+    let filtered = [...(paginatedUsers?.data || [])];
+
+    // Aplicar filtro de busca
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(user =>
+        user.name.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term)
+      );
+    }
+
+    return filtered.sort((a, b) => b.pontos - a.pontos);
+  }, [paginatedUsers?.data, searchTerm]);
 
   if (isLoading) {
     return (
@@ -59,11 +77,6 @@ export default function Ranking() {
 
       <div className="ranking-content">
         <div className="ranking-header">
-          <img
-            alt="Troféu"
-            className="ranking-trophy"
-            src="https://res.cloudinary.com/dnulz0tix/image/upload/v1733821330/khkunz0zbgkhuhqugvqc.png"
-          />
           <div className="ranking-progress-card">
             <div className="progress-header">
               <span className="progress-icon">🎯</span>
@@ -91,7 +104,8 @@ export default function Ranking() {
                 <div
                   key={user.id}
                   className={`podium-item podium-${position}`}
-                  style={{ order: position === 1 ? 2 : position === 2 ? 1 : 3 }}
+                  style={{ order: position === 1 ? 2 : position === 2 ? 1 : 3, cursor: 'pointer' }}
+                  onClick={() => navigate(`/perfil/${user.id}`)}
                 >
                   <div className="podium-user">
                     <div className="podium-medal">{medals[position]}</div>
@@ -118,11 +132,55 @@ export default function Ranking() {
         </div>
 
         <div className="ranking-list">
-          <h3 className="ranking-list-title">
-            <span>📊</span> Ranking Completo
-          </h3>
+          <div style={{ marginBottom: '1.5rem' }}>
+            <h3 className="ranking-list-title">
+              <span>📊</span> Ranking Completo
+            </h3>
+            {/* Campo de busca */}
+            <div style={{ marginTop: '1rem' }}>
+              <input
+                type="text"
+                placeholder="🔍 Buscar usuário por nome ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '14px 20px',
+                  borderRadius: '12px',
+                  border: '2px solid rgba(238, 147, 0, 0.3)',
+                  background: 'rgba(26, 33, 26, 0.8)',
+                  color: 'white',
+                  fontSize: '1rem',
+                  outline: 'none',
+                  transition: 'all 0.3s ease',
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#EE9300';
+                  e.target.style.boxShadow = '0 0 0 4px rgba(238, 147, 0, 0.1)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(238, 147, 0, 0.3)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              />
+              {searchTerm && (
+                <p style={{
+                  marginTop: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.9rem'
+                }}>
+                  {sortedUsers.length} resultado{sortedUsers.length !== 1 ? 's' : ''} encontrado{sortedUsers.length !== 1 ? 's' : ''}
+                </p>
+              )}
+            </div>
+          </div>
           {sortedUsers.slice(3).map((user, index) => (
-            <div key={user.id} className="ranking-list-item">
+            <div
+              key={user.id}
+              className="ranking-list-item"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate(`/perfil/${user.id}`)}
+            >
               <div className="ranking-position">{index + 4}°</div>
               <img
                 className="ranking-avatar"

@@ -1,58 +1,78 @@
 /* eslint-disable no-unused-vars */
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import EmptyState from "../components/EmptyState";
+import { showToast } from "@/lib/toast";
 import api from "../services/api";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import './style.css'
 import { User } from "@/types";
+import { useMyConquistas } from "@/hooks/api/useConquistas";
+
 export default function Perfil(){
-    const [usersInfo, setUsersInfo] = useState<User[]>([]);
+    const navigate = useNavigate();
+    const [usersInfo, setUsersInfo] = useState<User>({} as User);
     const [profilePics, setProfilePics] = useState([]);
-    const [url, setUrl] = useState('https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png');
+    const defaultUrl = 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
+    const [url, setUrl] = useState(defaultUrl);
     const [name, setName] = useState('');
-    const [biografia, setBiografia] = useState('');
-    const [seguidores, setSeguidores] = useState('');
-    const [seguindo, setSeguindo] = useState('');
-    const [pontos, setPontos] = useState('');
     const [userId, setUserId] = useState(null);
+
+    // Validar URL
+    const isValidUrl = (testUrl: string | undefined): boolean => {
+      if (!testUrl || testUrl.trim() === '') return false;
+      try {
+        new URL(testUrl);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    // Hook para buscar conquistas
+    const { data: conquistas = [], isLoading: loadingConquistas } = useMyConquistas();
 
     const getUser = async () => {
         try {
           const me = await api.get('/auth/me');
           setUserId(me.data.id);
-          const usersInfoFromApi = await api.get(`/users/${me.data.id}`)
+          const usersInfoFromApi = await api.get(`/usuarios/${me.data.id}`)
           setUsersInfo(usersInfoFromApi.data);
-        } catch (error) {
-          console.error(error);
+        } catch (error: any) {
+          console.error('Erro ao buscar usuário:', error);
+          const errorMsg = error?.response?.data?.message || 'Erro ao carregar dados do perfil';
+          showToast.error(errorMsg);
         }
       }
 
       const getProfilePics = async () => {
         try {
           if (!userId) return;
-          const profilePicFromApi = await api.get('/profilePic');
+          const profilePicFromApi = await api.get('/profile-pic');
           setProfilePics(profilePicFromApi.data);
           const matchingProfilePic = profilePicFromApi.data.find(profilePic => profilePic.userId === userId)
-    
+
           if (matchingProfilePic) {
-            setUrl(matchingProfilePic.url);
+            // Validar URL antes de setar
+            const picUrl = matchingProfilePic.url;
+            if (isValidUrl(picUrl)) {
+              setUrl(picUrl);
+            } else {
+              setUrl(defaultUrl);
+            }
             setName(matchingProfilePic.name);
             return
-          }
-          // biome-ignore lint/style/noUselessElse: <explanation>
-          else{
-            const userFromApi = await api.get(`/users/${userId}`);
+          } else {
+            const userFromApi = await api.get(`/usuarios/${userId}`);
             setName(userFromApi.data.name);
-            setBiografia(userFromApi.data.biografia);
-            setSeguidores(userFromApi.data.seguidores);
-            setSeguindo(userFromApi.data.seguindo);
-            setPontos(userFromApi.data.pontos);
           }
-        } catch (error) {
-          console.error(error);
+        } catch (error: any) {
+          console.error('Erro ao buscar foto de perfil:', error);
+          // Não mostrar toast aqui pois é silencioso (foto padrão)
         }
       }
-    
+
       useEffect(() => {
         getUser();
       }, []);
@@ -111,24 +131,38 @@ export default function Perfil(){
                     <h3 className="achievements-title">
                         <span>🏆</span> Conquistas Ecológicas
                     </h3>
-                    <div className="achievements-grid">
-                        <div className="achievement-badge">
-                            <div className="achievement-icon">🌱</div>
-                            <div className="achievement-name">Iniciante</div>
+
+                    {loadingConquistas ? (
+                        <div style={{ textAlign: 'center', padding: '20px', color: 'rgba(255, 255, 255, 0.6)' }}>
+                            ⏳ Carregando conquistas...
                         </div>
-                        <div className="achievement-badge">
-                            <div className="achievement-icon">♻️</div>
-                            <div className="achievement-name">Reciclador</div>
+                    ) : conquistas.length > 0 ? (
+                        <div className="achievements-grid">
+                            {conquistas.map((conquista) => (
+                                <div
+                                    key={conquista.id}
+                                    className={`achievement-badge ${!conquista.desbloqueada ? 'locked' : ''}`}
+                                    title={conquista.descricao}
+                                >
+                                    <div className="achievement-icon">{conquista.icone}</div>
+                                    <div className="achievement-name">{conquista.nome}</div>
+                                    {conquista.desbloqueada && (
+                                        <div style={{ fontSize: '10px', color: '#4CAF50', marginTop: '4px' }}>
+                                            ✓ Desbloqueada
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
-                        <div className="achievement-badge locked">
-                            <div className="achievement-icon">🌍</div>
-                            <div className="achievement-name">Guardião</div>
-                        </div>
-                        <div className="achievement-badge locked">
-                            <div className="achievement-icon">🌟</div>
-                            <div className="achievement-name">Lenda</div>
-                        </div>
-                    </div>
+                    ) : (
+                        <EmptyState
+                            icon="🏆"
+                            title="Nenhuma conquista ainda"
+                            description="Complete desafios ecológicos para desbloquear conquistas e ganhar pontos!"
+                            actionLabel="Ver Desafios"
+                            onAction={() => navigate('/Home')}
+                        />
+                    )}
                 </div>
             </div>
 

@@ -24,13 +24,15 @@ export interface CreatePostData {
   likes?: number;
 }
 
-// Hook to get all posts
-export const usePosts = () => {
+// Hook to get all posts with pagination
+export const usePosts = (page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: queryKeys.posts.all,
-    queryFn: async (): Promise<Post[]> => {
+    queryKey: [...queryKeys.posts.all, page, limit],
+    queryFn: async () => {
       try {
-        const response = await api.get<Post[]>('/posts');
+        const response = await api.get('/posts', {
+          params: { page, limit }
+        });
         return response.data;
       } catch (error) {
         throw createApiError(error, 'Get all posts');
@@ -175,19 +177,33 @@ export const useDeletePost = () => {
   });
 };
 
-// Hook to like/unlike a post
+// Hook to like a post
 export const useLikePost = () => {
-  const updatePost = useUpdatePost();
+  const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, currentLikes }: { postId: string; currentLikes: number }) => {
-      return updatePost.mutateAsync({
-        id: postId,
-        likes: currentLikes + 1,
-      });
+    mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => {
+      try {
+        const response = await api.patch(`/posts/${postId}/like`, { userId });
+        return response.data;
+      } catch (error) {
+        throw createApiError(error, `Like post ${postId}`);
+      }
     },
-    onSuccess: () => {
-      // The updatePost mutation will handle cache updates
+    onSuccess: (updatedPost) => {
+      // Update in all posts
+      queryClient.setQueryData(queryKeys.posts.all, (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((post: Post) =>
+            post.id === updatedPost.id ? updatedPost : post
+          ),
+        };
+      });
+
+      queryClient.setQueryData(queryKeys.posts.detail(updatedPost.id), updatedPost);
+      invalidateQueries.posts();
     },
   });
 };
@@ -197,34 +213,53 @@ export const useOptimisticLike = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ postId, increment }: { postId: string; increment: number }) => {
+    mutationFn: async ({ postId, userId, increment = 1 }: { postId: string; userId: string; increment?: number }) => {
       // Optimistically update the UI
-      const updatePost = (old: Post[] = []) => {
-        return old.map(post => 
-          post.id === postId 
-            ? { ...post, likes: Math.max(0, post.likes + increment) }
-            : post
-        );
+      const updatePosts = (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((post: Post) =>
+            post.id === postId
+              ? { ...post, likes: Math.max(0, post.likes + increment) }
+              : post
+          ),
+        };
       };
 
-      queryClient.setQueryData(queryKeys.posts.all, updatePost);
-      
-      // Try to update the actual post
-      const response = await api.put<Post>(`/posts/${postId}/like`, { increment });
+      queryClient.setQueryData([...queryKeys.posts.all], updatePosts);
+
+      // Make the actual API call
+      const response = await api.patch<Post>(`/posts/${postId}/like`, { userId });
       return response.data;
     },
-    onError: (error, { postId, increment }) => {
+    onSuccess: (updatedPost) => {
+      // Update with server data
+      queryClient.setQueryData([...queryKeys.posts.all], (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((post: Post) =>
+            post.id === updatedPost.id ? updatedPost : post
+          ),
+        };
+      });
+    },
+    onError: (error, { postId, increment = 1 }) => {
       // Revert the optimistic update on error
-      const revertUpdate = (old: Post[] = []) => {
-        return old.map(post => 
-          post.id === postId 
-            ? { ...post, likes: Math.max(0, post.likes - increment) }
-            : post
-        );
+      const revertUpdate = (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((post: Post) =>
+            post.id === postId
+              ? { ...post, likes: Math.max(0, post.likes - increment) }
+              : post
+          ),
+        };
       };
 
-      queryClient.setQueryData(queryKeys.posts.all, revertUpdate);
-      
+      queryClient.setQueryData([...queryKeys.posts.all], revertUpdate);
       console.error('Failed to like post:', createApiError(error, 'Like post'));
     },
   });

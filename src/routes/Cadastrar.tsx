@@ -5,6 +5,7 @@ import { useRegister } from '@/hooks/api';
 import { RegisterFormData } from '@/types';
 import { ValidationUtils } from '@/utils/validation';
 import { createApiError } from '@/utils/errorHandler';
+import PasswordStrength from '@/components/PasswordStrength';
 
 const Cadastrar: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Cadastrar: React.FC = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
     name: '',
     email: '',
-    age: '',
+    dataNascimento: '',
     password: '',
     confirmPassword: '',
     biografia: ''
@@ -35,14 +36,9 @@ const Cadastrar: React.FC = () => {
     setError('');
     
     try {
-      const registerData = {
-        ...formData,
-        age: parseInt(formData.age, 10)
-      };
-      
       ValidationUtils.validateRegisterForm(formData);
-      
-      await registerMutation.mutateAsync(registerData);
+
+      await registerMutation.mutateAsync(formData);
       navigate('/');
     } catch (error) {
       const appError = createApiError(error, 'User registration');
@@ -92,13 +88,12 @@ const Cadastrar: React.FC = () => {
             <span className="input-icon-cadastro">🎂</span>
             <input
               className="input-cadastro"
-              type="number"
-              placeholder="Digite sua idade"
-              value={formData.age}
-              onChange={handleInputChange('age')}
+              type="date"
+              placeholder="Data de nascimento"
+              value={formData.dataNascimento}
+              onChange={handleInputChange('dataNascimento')}
               disabled={registerMutation.isPending}
-              min="13"
-              max="120"
+              max={new Date().toISOString().split('T')[0]}
               required
             />
           </div>
@@ -125,8 +120,10 @@ const Cadastrar: React.FC = () => {
               onChange={handleInputChange('password')}
               disabled={registerMutation.isPending}
               required
+              minLength={8}
             />
           </div>
+          <PasswordStrength password={formData.password} />
 
           <div className="input-group-cadastro">
             <span className="input-icon-cadastro">✅</span>
@@ -138,6 +135,7 @@ const Cadastrar: React.FC = () => {
               onChange={handleInputChange('confirmPassword')}
               disabled={registerMutation.isPending}
               required
+              minLength={8}
             />
           </div>
 

@@ -1,0 +1,94 @@
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  gap: 12px;
+}
+
+.skeleton-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.skeleton-actions {
+  padding: 12px 16px;
+}
+
+.skeleton-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px;
+  background: white;
+  border-radius: 16px;
+}
+
+.skeleton-avatar {
+  margin-bottom: 8px;
+}
+
+.skeleton-name {
+  margin-bottom: 8px;
+}
+
+.skeleton-stats {
+  display: flex;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.skeleton-list-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.skeleton-list-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .skeleton-card {
+    border-radius: 0;
+    margin-bottom: 0;
+    border-bottom: 8px solid #f5f5f5;
+  }
+}

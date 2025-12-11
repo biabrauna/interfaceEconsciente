@@ -64,14 +64,34 @@ export const useProfilePics = () => {
   });
 };
 
+// Helper function to validate URLs
+const isValidUrl = (url: string | undefined): boolean => {
+  if (!url || url.trim() === '') {
+    console.warn('[useUserProfilePic] Empty or undefined URL detected');
+    return false;
+  }
+  try {
+    new URL(url);
+    return true;
+  } catch (error) {
+    console.error('[useUserProfilePic] Invalid URL detected:', url, error);
+    return false;
+  }
+};
+
 // Hook to get a specific user's profile picture
 export const useUserProfilePic = (userId: string) => {
   const { data: profilePics, ...rest } = useProfilePics();
-  
+
   const userProfilePic = profilePics?.find(pic => pic.userId === userId);
-  
+
+  // Validate and sanitize the URL before returning
+  const sanitizedProfilePic = userProfilePic && isValidUrl(userProfilePic.url)
+    ? userProfilePic
+    : undefined;
+
   return {
-    data: userProfilePic,
+    data: sanitizedProfilePic,
     ...rest,
   };
 };

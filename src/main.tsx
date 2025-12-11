@@ -11,7 +11,12 @@ import Duvidas from '@/routes/Duvidas';
 import Camera from '@/routes/Camera';
 import MapPage from '@/routes/Localizacao';
 import Perfil from '@/routes/Perfil';
+import PerfilPublico from '@/routes/PerfilPublico';
+import EditarPerfil from '@/routes/EditarPerfil';
 import Ranking from '@/routes/Ranking';
+import Posts from '@/routes/Posts';
+import Feedback from '@/routes/Feedback';
+import NotFound from '@/routes/NotFound';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
 import ErrorBoundary from '@/components/ErrorBoundary';
@@ -71,6 +76,16 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "Camera/:desafioId",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <Camera />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
         path: "Camera",
         element: (
           <ErrorBoundary>
@@ -101,6 +116,26 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "perfil/:userId",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <PerfilPublico />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: "EditarPerfil",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <EditarPerfil />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
         path: "Ranking",
         element: (
           <ErrorBoundary>
@@ -111,14 +146,30 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "Posts",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <Posts />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: "Feedback",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <Feedback />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
         path: "*",
         element: (
           <ErrorBoundary>
-            <div>
-              <h2>404 - Página não encontrada</h2>
-              <p>Não encontramos o que você está procurando.</p>
-              <a href="/">Voltar para a página inicial</a>
-            </div>
+            <NotFound />
           </ErrorBoundary>
         ),
       }

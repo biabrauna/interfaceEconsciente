@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import uploadImage from '@/assets/images/upload (2).png';
 import { useAuthState, useCreatePost } from '@/hooks/api';
 import { createApiError } from '@/utils/errorHandler';
+import { showToast } from '@/lib/toast';
 
 interface CloudinaryResponse {
   public_id: string;
@@ -17,6 +18,19 @@ const ImageUploader: React.FC = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { user } = useAuthState();
   const createPostMutation = useCreatePost();
+
+  // Validar URL para evitar erros
+  const isValidImageUrl = (testUrl: string): boolean => {
+    if (!testUrl || testUrl === uploadImage) return true; // uploadImage é um import de imagem local
+    try {
+      new URL(testUrl);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const safeImageUrl = isValidImageUrl(imageUrl) ? imageUrl : uploadImage;
 
   const handlePostarFoto = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -34,8 +48,10 @@ const ImageUploader: React.FC = () => {
         userId: user.id,
         likes: 0
       });
-      setAlertMessage('Foto postada com sucesso! A foto irá para análise e, em breve, seus pontos serão computados.');
+      const successMsg = 'Foto postada com sucesso! A foto irá para análise e, em breve, seus pontos serão computados.';
+      setAlertMessage(successMsg);
       setAlertType('success');
+      showToast.success('Foto postada com sucesso! 🎉');
       setUrl(''); // Reset form
       setImageUrl(uploadImage);
       setTimeout(() => setAlertMessage(''), 5000);
@@ -50,17 +66,23 @@ const ImageUploader: React.FC = () => {
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
     const file = event.target.files?.[0];
     if (!file) {
-      setErrorMessage('Por favor, selecione um arquivo para upload.');
+      const msg = 'Por favor, selecione um arquivo para upload.';
+      setErrorMessage(msg);
+      showToast.warning(msg);
       return;
     }
-    
+
     if (!file.type.startsWith('image/')) {
-      setErrorMessage('Por favor, selecione apenas arquivos de imagem.');
+      const msg = 'Por favor, selecione apenas arquivos de imagem (JPG, PNG, WebP).';
+      setErrorMessage(msg);
+      showToast.error(msg);
       return;
     }
-    
+
     if (file.size > 5 * 1024 * 1024) {
-      setErrorMessage('Arquivo muito grande. Máximo 5MB.');
+      const msg = `Arquivo muito grande (${(file.size / 1024 / 1024).toFixed(1)}MB). Máximo permitido: 5MB.`;
+      setErrorMessage(msg);
+      showToast.error(msg);
       return;
     }
     
@@ -167,11 +189,11 @@ const ImageUploader: React.FC = () => {
             width: '100%',
             aspectRatio: '4/3',
             maxHeight: '320px',
-            background: imageUrl === uploadImage
+            background: safeImageUrl === uploadImage
               ? 'rgba(50, 52, 65, 0.6)'
-              : `url(${imageUrl}) center/cover`,
+              : `url(${safeImageUrl}) center/cover`,
             borderRadius: '16px',
-            border: imageUrl === uploadImage
+            border: safeImageUrl === uploadImage
               ? '2px dashed rgba(238, 147, 0, 0.4)'
               : '2px solid rgba(0, 163, 53, 0.4)',
             display: 'flex',
@@ -191,7 +213,7 @@ const ImageUploader: React.FC = () => {
                 justifyContent: 'center',
                 cursor: 'pointer',
                 padding: '30px',
-                background: imageUrl === uploadImage
+                background: safeImageUrl === uploadImage
                   ? 'transparent'
                   : 'rgba(0, 0, 0, 0.5)',
                 borderRadius: '12px',
@@ -204,18 +226,18 @@ const ImageUploader: React.FC = () => {
               <div style={{
                 fontSize: '3rem',
                 marginBottom: '12px',
-                filter: imageUrl === uploadImage ? 'none' : 'brightness(0) invert(1)'
+                filter: safeImageUrl === uploadImage ? 'none' : 'brightness(0) invert(1)'
               }}>
-                {imageUrl === uploadImage ? '📁' : '🔄'}
+                {safeImageUrl === uploadImage ? '📁' : '🔄'}
               </div>
               <span style={{
                 fontSize: '1rem',
                 fontWeight: '600',
-                color: imageUrl === uploadImage ? '#EE9300' : '#ffffff',
+                color: safeImageUrl === uploadImage ? '#EE9300' : '#ffffff',
                 textAlign: 'center',
-                textShadow: imageUrl === uploadImage ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.5)'
+                textShadow: safeImageUrl === uploadImage ? 'none' : '0 2px 4px rgba(0, 0, 0, 0.5)'
               }}>
-                {imageUrl === uploadImage ? 'Escolher Foto' : 'Trocar Foto'}
+                {safeImageUrl === uploadImage ? 'Escolher Foto' : 'Trocar Foto'}
               </span>
             </label>
             <input
