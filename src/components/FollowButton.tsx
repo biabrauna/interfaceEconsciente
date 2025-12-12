@@ -11,6 +11,9 @@ export default function FollowButton({ userId, onFollowChange }: FollowButtonPro
   const followMutation = useFollowUser();
   const unfollowMutation = useUnfollowUser();
 
+  // Calcular isPending antes de usar
+  const isPending = followMutation.isPending || unfollowMutation.isPending;
+
   const handleClick = async () => {
     // Previne cliques duplos enquanto a requisição está em andamento
     if (isPending) return;
@@ -28,7 +31,6 @@ export default function FollowButton({ userId, onFollowChange }: FollowButtonPro
     } catch (error: any) {
       const message = error?.response?.data?.message || error?.message || 'Erro ao processar solicitação';
       showToast.error(message);
-      console.error('Erro ao seguir/deixar de seguir:', error);
     }
   };
 
@@ -36,8 +38,6 @@ export default function FollowButton({ userId, onFollowChange }: FollowButtonPro
   if (isError) {
     return null;
   }
-
-  const isPending = followMutation.isPending || unfollowMutation.isPending;
 
   return (
     <button

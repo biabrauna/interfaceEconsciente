@@ -10,50 +10,96 @@ const QUERY_KEYS = {
 };
 
 /**
- * Hook para seguir um usuário
+ * Hook para seguir um usuário com optimistic updates
  */
 export function useFollowUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (userId: string) => followService.follow(userId),
+    onMutate: async (userId) => {
+      // Cancel outgoing queries
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
+
+      // Optimistically update isFollowing
+      queryClient.setQueryData(QUERY_KEYS.isFollowing(userId), true);
+
+      // Optimistically update user data (increment seguindo count)
+      const userKey = ['users', userId];
+      const previousUser = queryClient.getQueryData(userKey);
+      queryClient.setQueryData(userKey, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          seguidores: (old.seguidores || 0) + 1,
+        };
+      });
+
+      return { previousUser };
+    },
     onSuccess: (_, userId) => {
-      // Invalida caches relacionados
+      // Invalida caches relacionados para refetch com dados do servidor
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myFollowing });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.followers(userId) });
-
-      // Invalida queries de usuários de forma mais específica
-      queryClient.invalidateQueries({ queryKey: ['users'] }); // Lista geral
-      queryClient.invalidateQueries({ queryKey: ['users', userId] }); // Usuário específico sendo seguido
-      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] }); // Endpoint correto do backend
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] });
     },
-    onError: (error) => {
+    onError: (error, userId, context) => {
+      // Revert optimistic updates on error
+      if (context?.previousUser) {
+        queryClient.setQueryData(['users', userId], context.previousUser);
+      }
+      queryClient.setQueryData(QUERY_KEYS.isFollowing(userId), false);
       console.error('Erro ao seguir usuário:', error);
     },
   });
 }
 
 /**
- * Hook para deixar de seguir um usuário
+ * Hook para deixar de seguir um usuário com optimistic updates
  */
 export function useUnfollowUser() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (userId: string) => followService.unfollow(userId),
+    onMutate: async (userId) => {
+      // Cancel outgoing queries
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
+
+      // Optimistically update isFollowing
+      queryClient.setQueryData(QUERY_KEYS.isFollowing(userId), false);
+
+      // Optimistically update user data (decrement seguindo count)
+      const userKey = ['users', userId];
+      const previousUser = queryClient.getQueryData(userKey);
+      queryClient.setQueryData(userKey, (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          seguidores: Math.max(0, (old.seguidores || 0) - 1),
+        };
+      });
+
+      return { previousUser };
+    },
     onSuccess: (_, userId) => {
-      // Invalida caches relacionados
+      // Invalida caches relacionados para refetch com dados do servidor
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.isFollowing(userId) });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.myFollowing });
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.followers(userId) });
-
-      // Invalida queries de usuários de forma mais específica
-      queryClient.invalidateQueries({ queryKey: ['users'] }); // Lista geral
-      queryClient.invalidateQueries({ queryKey: ['users', userId] }); // Usuário específico
-      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] }); // Endpoint correto do backend
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['users', userId] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios', userId] });
     },
-    onError: (error) => {
+    onError: (error, userId, context) => {
+      // Revert optimistic updates on error
+      if (context?.previousUser) {
+        queryClient.setQueryData(['users', userId], context.previousUser);
+      }
+      queryClient.setQueryData(QUERY_KEYS.isFollowing(userId), true);
       console.error('Erro ao deixar de seguir usuário:', error);
     },
   });

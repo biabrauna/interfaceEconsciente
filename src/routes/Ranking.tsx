@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useUsers } from "@/hooks/api/useUsers";
 import { useNavigate } from "react-router-dom";
+import { SkeletonList } from "@/components/Skeleton";
 
 export default function Ranking() {
   const navigate = useNavigate();
@@ -37,15 +38,30 @@ export default function Ranking() {
     return (
       <div className="ranking-page">
         <Navbar />
-        <div style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
-          fontSize: '1.2rem'
-        }}>
-          ⏳ Carregando ranking...
+        <div className="ranking-container" style={{ paddingTop: '90px' }}>
+          <div className="ranking-header">
+            <div style={{
+              width: '80px',
+              height: '80px',
+              background: 'linear-gradient(135deg, #EE9300 0%, #ff9e00 100%)',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 20px',
+              fontSize: '2.5rem',
+              boxShadow: '0 8px 24px rgba(238, 147, 0, 0.4)',
+            }}>
+              🏆
+            </div>
+            <h1 className="ranking-title">Ranking de Campeões</h1>
+            <p style={{ color: 'rgba(255, 255, 255, 0.7)', margin: '8px 0 24px' }}>
+              Carregando ranking...
+            </p>
+          </div>
+          <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto' }}>
+            <SkeletonList count={10} />
+          </div>
         </div>
         <Footer />
       </div>

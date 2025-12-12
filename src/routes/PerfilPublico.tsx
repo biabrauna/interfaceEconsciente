@@ -1,113 +1,55 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FollowButton from "../components/FollowButton";
 import EmptyState from "../components/EmptyState";
-import { showToast } from "@/lib/toast";
-import api from "../services/api";
 import './style.css';
-import { User } from "@/types";
-import { useMyConquistas } from "@/hooks/api/useConquistas";
+import { useMe } from "@/hooks/api/useAuth";
+import { useUser, useUserProfilePic } from "@/hooks/api/useUsers";
+import { useQuery } from '@tanstack/react-query';
+import api from "../services/api";
 
 export default function PerfilPublico() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
-  const [userInfo, setUserInfo] = useState<User | null>(null);
   const defaultProfilePic = 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
-  const [profilePic, setProfilePic] = useState(defaultProfilePic);
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [conquistas, setConquistas] = useState<any[]>([]);
 
-  // Validar URL
-  const isValidUrl = (url: string | undefined): boolean => {
-    if (!url || url.trim() === '') return false;
-    try {
-      new URL(url);
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  // Buscar usuário logado
+  const { data: currentUser } = useMe();
 
+  // Redirecionar se o usuário está vendo seu próprio perfil
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const me = await api.get('/auth/me');
-        setCurrentUserId(me.data.id);
-
-        // Se o usuário está vendo seu próprio perfil, redireciona para /Perfil
-        if (me.data.id === userId) {
-          navigate('/Perfil', { replace: true });
-          return;
-        }
-      } catch (error: any) {
-        console.error('Erro ao buscar usuário atual:', error);
-        const errorMsg = error?.response?.data?.message || 'Erro ao verificar autenticação';
-        showToast.error(errorMsg);
-      }
-    };
-
-    if (userId) {
-      fetchCurrentUser();
+    if (currentUser?.id && currentUser.id === userId) {
+      navigate('/Perfil', { replace: true });
     }
-  }, [userId, navigate]);
+  }, [currentUser, userId, navigate]);
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      if (!userId) return;
+  // Buscar dados do usuário público
+  const { data: userInfo, isLoading: loadingUser } = useUser(userId || '');
 
+  // Buscar foto de perfil
+  const { data: userProfilePic } = useUserProfilePic(userId || '');
+
+  // Buscar conquistas do usuário com React Query
+  const { data: conquistas = [], isLoading: loadingConquistas } = useQuery({
+    queryKey: ['conquistas', 'user', userId],
+    queryFn: async () => {
       try {
-        setLoading(true);
-
-        // Buscar informações do usuário
-        const userResponse = await api.get(`/usuarios/${userId}`);
-        setUserInfo(userResponse.data);
-        setName(userResponse.data.name);
-
-        // Buscar foto de perfil
-        try {
-          const profilePicResponse = await api.get('/profile-pic');
-          const matchingProfilePic = profilePicResponse.data.find(
-            (pic: any) => pic.userId === userId
-          );
-
-          if (matchingProfilePic) {
-            // Validar URL antes de setar
-            const picUrl = matchingProfilePic.url;
-            if (isValidUrl(picUrl)) {
-              setProfilePic(picUrl);
-            } else {
-              setProfilePic(defaultProfilePic);
-            }
-            setName(matchingProfilePic.name || userResponse.data.name);
-          }
-        } catch (error) {
-          // Silenciar erro, foto de perfil é opcional
-        }
-
-        // Buscar conquistas do usuário
-        try {
-          const conquistasResponse = await api.get(`/conquistas/user/${userId}`);
-          setConquistas(conquistasResponse.data || []);
-        } catch (error) {
-          // Silenciar erro, conquistas são opcionais
-          setConquistas([]);
-        }
-
-        setLoading(false);
-      } catch (error: any) {
-        console.error('Erro ao buscar dados do perfil:', error);
-        const errorMsg = error?.response?.data?.message || 'Erro ao carregar perfil';
-        showToast.error(errorMsg);
-        setLoading(false);
+        const response = await api.get(`/conquistas/user/${userId}`);
+        return response.data || [];
+      } catch (error) {
+        return [];
       }
-    };
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutos
+  });
 
-    fetchUserData();
-  }, [userId]);
+  // Determinar valores a exibir
+  const profilePic = userProfilePic?.url || defaultProfilePic;
+  const name = userProfilePic?.name || userInfo?.name || '';
+  const loading = loadingUser || loadingConquistas;
 
   if (loading) {
     return (
@@ -155,18 +97,9 @@ export default function PerfilPublico() {
           <h2 className="profile-name">{name}</h2>
 
           {/* Botão de seguir/deixar de seguir */}
-          {currentUserId && currentUserId !== userId && (
+          {currentUser?.id && currentUser.id !== userId && (
             <div style={{ marginTop: '1rem', marginBottom: '1rem' }}>
-              <FollowButton
-                userId={userId!}
-                onFollowChange={(isFollowing) => {
-                  // Atualiza contadores localmente para feedback imediato
-                  setUserInfo(prev => prev ? {
-                    ...prev,
-                    seguidores: isFollowing ? prev.seguidores + 1 : prev.seguidores - 1
-                  } : null);
-                }}
-              />
+              <FollowButton userId={userId!} />
             </div>
           )}
 

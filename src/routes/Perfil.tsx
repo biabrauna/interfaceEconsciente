@@ -1,85 +1,56 @@
-/* eslint-disable no-unused-vars */
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import EmptyState from "../components/EmptyState";
-import { showToast } from "@/lib/toast";
-import api from "../services/api";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './style.css'
-import { User } from "@/types";
 import { useMyConquistas } from "@/hooks/api/useConquistas";
+import { useMe } from "@/hooks/api/useAuth";
+import { useUser, useUserProfilePic } from "@/hooks/api/useUsers";
 
 export default function Perfil(){
     const navigate = useNavigate();
-    const [usersInfo, setUsersInfo] = useState<User>({} as User);
-    const [profilePics, setProfilePics] = useState([]);
     const defaultUrl = 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
-    const [url, setUrl] = useState(defaultUrl);
-    const [name, setName] = useState('');
-    const [userId, setUserId] = useState(null);
 
-    // Validar URL
-    const isValidUrl = (testUrl: string | undefined): boolean => {
-      if (!testUrl || testUrl.trim() === '') return false;
-      try {
-        new URL(testUrl);
-        return true;
-      } catch {
-        return false;
-      }
-    };
+    // Usar React Query para buscar dados do usuário logado
+    const { data: currentUser, isLoading: loadingMe } = useMe();
+    const userId = currentUser?.id;
 
-    // Hook para buscar conquistas
+    // Buscar dados completos do usuário
+    const { data: usersInfo, isLoading: loadingUserInfo } = useUser(userId || '');
+
+    // Buscar foto de perfil do usuário
+    const { data: userProfilePic, isLoading: loadingProfilePic } = useUserProfilePic(userId || '');
+
+    // Buscar conquistas
     const { data: conquistas = [], isLoading: loadingConquistas } = useMyConquistas();
 
-    const getUser = async () => {
-        try {
-          const me = await api.get('/auth/me');
-          setUserId(me.data.id);
-          const usersInfoFromApi = await api.get(`/usuarios/${me.data.id}`)
-          setUsersInfo(usersInfoFromApi.data);
-        } catch (error: any) {
-          console.error('Erro ao buscar usuário:', error);
-          const errorMsg = error?.response?.data?.message || 'Erro ao carregar dados do perfil';
-          showToast.error(errorMsg);
-        }
-      }
+    // Determinar URL da foto de perfil
+    const url = userProfilePic?.url || defaultUrl;
+    const name = userProfilePic?.name || usersInfo?.name || currentUser?.name || '';
 
-      const getProfilePics = async () => {
-        try {
-          if (!userId) return;
-          const profilePicFromApi = await api.get('/profile-pic');
-          setProfilePics(profilePicFromApi.data);
-          const matchingProfilePic = profilePicFromApi.data.find(profilePic => profilePic.userId === userId)
+    // Loading state combinado
+    const isLoading = loadingMe || loadingUserInfo || loadingProfilePic;
 
-          if (matchingProfilePic) {
-            // Validar URL antes de setar
-            const picUrl = matchingProfilePic.url;
-            if (isValidUrl(picUrl)) {
-              setUrl(picUrl);
-            } else {
-              setUrl(defaultUrl);
-            }
-            setName(matchingProfilePic.name);
-            return
-          } else {
-            const userFromApi = await api.get(`/usuarios/${userId}`);
-            setName(userFromApi.data.name);
-          }
-        } catch (error: any) {
-          console.error('Erro ao buscar foto de perfil:', error);
-          // Não mostrar toast aqui pois é silencioso (foto padrão)
-        }
-      }
-
-      useEffect(() => {
-        getUser();
-      }, []);
-
-      useEffect(() => {
-        getProfilePics();
-      }, [userId]);
+    // Show loading state
+    if (isLoading) {
+        return (
+            <div className="perfil-page">
+                <Navbar />
+                <div className="perfil-content" style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    minHeight: '50vh'
+                }}>
+                    <div style={{ textAlign: 'center', color: 'rgba(255, 255, 255, 0.7)' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+                        <p>Carregando perfil...</p>
+                    </div>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
 
     return(
         <div className="perfil-page">

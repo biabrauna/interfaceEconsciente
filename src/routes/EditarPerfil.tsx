@@ -2,16 +2,19 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { useAuth } from '@/hooks/useAuth';
 import { showToast } from '@/lib/toast';
-import api from '../services/api';
+import { useMe } from '@/hooks/api/useAuth';
+import { useUser, useUpdateUser } from '@/hooks/api/useUsers';
 import './style.css';
 
 export default function EditarPerfil() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Buscar dados do usuário logado usando React Query
+  const { data: currentUser } = useMe();
+  const { data: userData, isLoading: loadingUserData } = useUser(currentUser?.id || '');
+  const updateUserMutation = useUpdateUser();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,39 +23,37 @@ export default function EditarPerfil() {
     biografia: '',
   });
 
+  // Preencher form quando os dados forem carregados do cache ou da API
   useEffect(() => {
-    if (user?.id) {
-      loadUserData();
-    }
-  }, [user]);
-
-  const loadUserData = async () => {
-    try {
-      const response = await api.get(`/usuarios/${user?.id}`);
-      // Converter ISO string para formato YYYY-MM-DD
-      const dateValue = response.data.dataNascimento
-        ? new Date(response.data.dataNascimento).toISOString().split('T')[0]
+    if (userData) {
+      const dateValue = userData.dataNascimento
+        ? new Date(userData.dataNascimento).toISOString().split('T')[0]
         : '';
 
       setFormData({
-        name: response.data.name || '',
-        email: response.data.email || '',
+        name: userData.name || '',
+        email: userData.email || '',
         dataNascimento: dateValue,
-        biografia: response.data.biografia || '',
+        biografia: userData.biografia || '',
       });
-    } catch (error) {
-      console.error('Erro ao carregar dados:', error);
-      showToast.error('Erro ao carregar dados do perfil');
     }
-  };
+  }, [userData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setSuccess(false);
 
+    if (!currentUser?.id) {
+      showToast.error('Usuário não autenticado');
+      return;
+    }
+
     try {
-      await api.put(`/usuarios/${user?.id}`, formData);
+      await updateUserMutation.mutateAsync({
+        id: currentUser.id,
+        ...formData,
+      });
+
       setSuccess(true);
       showToast.success('Perfil atualizado com sucesso!');
 
@@ -61,7 +62,6 @@ export default function EditarPerfil() {
 
       setTimeout(() => {
         if (fromOnboarding === 'true') {
-          // Não remove from_onboarding aqui, deixa o Onboarding fazer isso
           navigate('/Home');
         } else {
           navigate('/Perfil');
@@ -69,10 +69,8 @@ export default function EditarPerfil() {
       }, 1500);
     } catch (error: any) {
       console.error('Erro ao atualizar perfil:', error);
-      const errorMessage = error?.response?.data?.message || 'Erro ao atualizar perfil. Tente novamente.';
+      const errorMessage = error?.message || 'Erro ao atualizar perfil. Tente novamente.';
       showToast.error(errorMessage);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -83,6 +81,29 @@ export default function EditarPerfil() {
       [name]: value,
     }));
   };
+
+  // Loading state
+  if (loadingUserData) {
+    return (
+      <div className="perfil-page">
+        <Navbar />
+        <div className="perfil-content" style={{
+          maxWidth: '600px',
+          margin: '0 auto',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '50vh'
+        }}>
+          <div style={{ textAlign: 'center', color: 'rgba(255, 255, 255, 0.7)' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⏳</div>
+            <p>Carregando dados...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="perfil-page">
@@ -194,19 +215,19 @@ export default function EditarPerfil() {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={updateUserMutation.isPending}
                 style={{
                   flex: 1,
                   padding: '12px',
-                  background: loading ? '#ccc' : '#4CAF50',
+                  background: updateUserMutation.isPending ? '#ccc' : '#4CAF50',
                   color: 'white',
                   border: 'none',
                   borderRadius: '8px',
                   fontWeight: '600',
-                  cursor: loading ? 'not-allowed' : 'pointer',
+                  cursor: updateUserMutation.isPending ? 'not-allowed' : 'pointer',
                 }}
               >
-                {loading ? 'Salvando...' : 'Salvar Alterações'}
+                {updateUserMutation.isPending ? 'Salvando...' : 'Salvar Alterações'}
               </button>
 
               <button

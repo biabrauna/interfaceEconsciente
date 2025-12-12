@@ -1,125 +1,83 @@
-/* eslint-disable no-unused-vars */
-import { useState, useMemo, useEffect } from "react";
-import {
-  GoogleMap,
-  Marker,
-  LoadScript,
-  StandaloneSearchBox,
-  DirectionsService,
-  DirectionsRenderer,
-} from "@react-google-maps/api";
+import { useState } from "react";
+import { GoogleMap, Marker, LoadScript } from "@react-google-maps/api";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { MapPin, Navigation, Search } from "lucide-react";
+import { MapPin } from "lucide-react";
 
 const MapPage = () => {
-  const [map, setMap] = useState(null);
-  const [searchBoxA, setSearchBoxA] = useState(null);
-  const [searchBoxB, setSearchBoxB] = useState(null);
-  const [pointA, setPointA] = useState(null);
-  const [pointB, setPointB] = useState(null);
-  const [origin, setOrigin] = useState(null);
-  const [destination, setDestination] = useState(null);
-  const [response, setResponse] = useState(null);
-  const [directionsService, setDirectionsService] = useState(null);
+  const [selectedPoint, setSelectedPoint] = useState(null);
 
-  const position = {
+  // Centro do mapa (Florianópolis)
+  const defaultCenter = {
     lat: -27.590824,
     lng: -48.551262,
   };
 
-  const onMapLoad = (map) => setMap(map);
-  const onLoadA = (ref) => setSearchBoxA(ref);
-  const onLoadB = (ref) => setSearchBoxB(ref);
-
-  useEffect(() => {
-    if (map) {
-      setDirectionsService(new window.google.maps.DirectionsService(map));
-    }
-  }, [map]);
-
-  const onPlacesChanged = (searchBox, setPoint) => {
-    if (searchBox) {
-      const places = searchBox.getPlaces();
-      if (places && places[0]?.geometry?.location) {
-        const location = {
-          lat: places[0].geometry.location.lat(),
-          lng: places[0].geometry.location.lng(),
-        };
-        setPoint(location);
-        map?.panTo(location);
-      }
-    }
-  };
-
-  const traceRoute = () => {
-    if (pointA && pointB && directionsService) {
-      directionsService.route(
-        {
-          origin: pointA,
-          destination: pointB,
-          travelMode: "DRIVING",
-        },
-        (response, status) => {
-          if (status === "OK") {
-            setResponse(response);
-          } else {
-            console.error("Directions request failed:", status, response);
-          }
-        }
-      );
-    }
-  };
-
-  const directionsServiceOptions = useMemo(
-    () =>
-      origin && destination
-        ? {
-            origin,
-            destination,
-            travelMode: "DRIVING",
-          }
-        : null,
-    [origin, destination]
-  );
-
-  const directionsCallback = (res) => {
-    if (res?.status === "OK") {
-      setResponse(res);
-    } else {
-      console.error("Directions request failed:", res?.status, res);
-    }
-  };
-
-  const directionsRendererOptions = useMemo(
-    () => (response ? { directions: response } : undefined),
-    [response]
-  );
-
+  // Pontos de coleta com coordenadas reais
   const pontos = [
     {
-      title: "Parada de Lucas",
+      id: 1,
+      title: "Centro de Reciclagem Norte",
       address: "Av. Brasil nº 13.550, em frente ao viaduto de Parada de Lucas",
-      emoji: "📍"
+      emoji: "♻️",
+      lat: -27.550824,
+      lng: -48.501262,
     },
     {
-      title: "Ilha do Governador",
+      id: 2,
+      title: "Ecoponto Ilha",
       address: "Av. Paranapuan - Comunidade do Dendê",
-      emoji: "🏝️"
+      emoji: "🏝️",
+      lat: -27.520824,
+      lng: -48.521262,
     },
-    { title: "Botafogo", address: "Rua General Polidoro, nº 65", emoji: "🌊" },
     {
-      title: "Penha",
+      id: 3,
+      title: "Coleta Seletiva Botafogo",
+      address: "Rua General Polidoro, nº 65",
+      emoji: "🌊",
+      lat: -27.590824,
+      lng: -48.551262,
+    },
+    {
+      id: 4,
+      title: "Centro Ambiental Penha",
       address: "Rua Merindiba, s/nº - Próximo à Igreja",
-      emoji: "⛪"
+      emoji: "⛪",
+      lat: -27.610824,
+      lng: -48.571262,
     },
-    { title: "Tijuca", address: "Rua Dr. Renato Rocco, 400", emoji: "🌳" },
-    { title: "Bangu", address: "Rua Roque Barbosa, 348 - Vila Catiri", emoji: "🏘️" },
-    { title: "Campo Grande", address: "Estrada do Magarça, 1", emoji: "🌾" },
     {
-      title: "Marechal Hermes",
+      id: 5,
+      title: "Ecoponto Tijuca",
+      address: "Rua Dr. Renato Rocco, 400",
+      emoji: "🌳",
+      lat: -27.630824,
+      lng: -48.591262,
+    },
+    {
+      id: 6,
+      title: "Reciclagem Bangu",
+      address: "Rua Roque Barbosa, 348 - Vila Catiri",
+      emoji: "🏘️",
+      lat: -27.570824,
+      lng: -48.531262,
+    },
+    {
+      id: 7,
+      title: "Coleta Campo Grande",
+      address: "Estrada do Magarça, 1",
+      emoji: "🌾",
+      lat: -27.600824,
+      lng: -48.481262,
+    },
+    {
+      id: 8,
+      title: "Centro Sustentável Hermes",
       address: "Rua Cmte. Magalhães de Almeida, 217",
-      emoji: "🏛️"
+      emoji: "🏛️",
+      lat: -27.560824,
+      lng: -48.561262,
     },
   ];
 
@@ -134,7 +92,7 @@ const MapPage = () => {
       <div style={{
         maxWidth: '1400px',
         margin: '0 auto',
-        padding: '80px 20px 20px'
+        padding: '80px 16px 20px'
       }}>
 
         {/* Header */}
@@ -182,27 +140,36 @@ const MapPage = () => {
           gap: '20px',
           marginBottom: '40px'
         }}>
-          {pontos.map((point, index) => (
+          {pontos.map((point) => (
             <div
-              key={index}
+              key={point.id}
+              onClick={() => setSelectedPoint(point)}
               style={{
-                background: 'rgba(26, 33, 26, 0.95)',
+                background: selectedPoint?.id === point.id
+                  ? 'rgba(0, 163, 53, 0.2)'
+                  : 'rgba(26, 33, 26, 0.95)',
                 borderRadius: '16px',
                 padding: '20px',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: selectedPoint?.id === point.id
+                  ? '2px solid #00A335'
+                  : '1px solid rgba(255, 255, 255, 0.1)',
                 boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
                 transition: 'all 0.3s ease',
                 cursor: 'pointer'
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)';
-                e.currentTarget.style.borderColor = 'rgba(0, 163, 53, 0.5)';
-                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 163, 53, 0.3)';
+                if (selectedPoint?.id !== point.id) {
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.borderColor = 'rgba(0, 163, 53, 0.5)';
+                  e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 163, 53, 0.3)';
+                }
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+                if (selectedPoint?.id !== point.id) {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.3)';
+                }
               }}
             >
               <div style={{
@@ -280,36 +247,34 @@ const MapPage = () => {
               alignItems: 'center',
               gap: '10px'
             }}>
-              <Navigation size={24} />
-              Traçar Rota
+              <MapPin size={24} />
+              Mapa de Localização
             </h2>
             <p style={{
               color: 'rgba(255, 255, 255, 0.7)',
               fontSize: '0.95rem',
               margin: '0'
             }}>
-              Digite os endereços de origem e destino para encontrar o melhor caminho
+              {selectedPoint
+                ? `📍 ${selectedPoint.title} - Clique no mapa para traçar rotas`
+                : 'Clique em um ponto de coleta acima para visualizá-lo no mapa'}
             </p>
           </div>
 
-          <LoadScript
-            googleMapsApiKey='AIzaSyB_cTTz6LzErqpPHKxkiFpXZncefRBZfBQ'
-            libraries={["places"]}
-          >
+          <LoadScript googleMapsApiKey='AIzaSyB_cTTz6LzErqpPHKxkiFpXZncefRBZfBQ'>
             <div style={{
               borderRadius: '16px',
               overflow: 'hidden',
-              border: '2px solid rgba(255, 255, 255, 0.1)'
+              border: '2px solid rgba(255, 255, 255, 0.1)',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
             }}>
               <GoogleMap
-                onLoad={onMapLoad}
                 mapContainerStyle={{
                   width: "100%",
-                  height: "500px",
-                  borderRadius: '16px'
+                  height: window.innerWidth < 768 ? "400px" : "500px",
                 }}
-                center={position}
-                zoom={13}
+                center={selectedPoint || defaultCenter}
+                zoom={selectedPoint ? 15 : 12}
                 options={{
                   styles: [
                     {
@@ -326,168 +291,61 @@ const MapPage = () => {
                       featureType: "all",
                       elementType: "labels.text.fill",
                       stylers: [{ color: "#746855" }]
+                    },
+                    {
+                      featureType: "water",
+                      elementType: "geometry",
+                      stylers: [{ color: "#17263c" }]
                     }
-                  ]
+                  ],
+                  zoomControl: true,
+                  mapTypeControl: true,
+                  scaleControl: true,
+                  streetViewControl: true,
+                  rotateControl: true,
+                  fullscreenControl: true
                 }}
               >
-                <div style={{
-                  position: 'absolute',
-                  top: '16px',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '12px',
-                  width: '90%',
-                  maxWidth: '400px',
-                  zIndex: 10
-                }}>
-                  <StandaloneSearchBox
-                    onLoad={onLoadA}
-                    onPlacesChanged={() => onPlacesChanged(searchBoxA, setPointA)}
-                  >
-                    <div style={{
-                      position: 'relative'
-                    }}>
-                      <Search
-                        size={18}
-                        style={{
-                          position: 'absolute',
-                          left: '14px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          color: '#00A335',
-                          zIndex: 1
-                        }}
-                      />
-                      <input
-                        style={{
-                          width: '100%',
-                          padding: '14px 14px 14px 44px',
-                          borderRadius: '12px',
-                          border: '2px solid rgba(0, 163, 53, 0.3)',
-                          background: 'rgba(26, 33, 26, 0.98)',
-                          color: 'white',
-                          fontSize: '0.95rem',
-                          outline: 'none',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                          transition: 'all 0.3s ease'
-                        }}
-                        placeholder="Endereço de origem"
-                        onFocus={(e) => {
-                          e.target.style.borderColor = '#00A335';
-                          e.target.style.boxShadow = '0 4px 16px rgba(0, 163, 53, 0.4)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(0, 163, 53, 0.3)';
-                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-                        }}
-                      />
-                    </div>
-                  </StandaloneSearchBox>
-
-                  <StandaloneSearchBox
-                    onLoad={onLoadB}
-                    onPlacesChanged={() => onPlacesChanged(searchBoxB, setPointB)}
-                  >
-                    <div style={{
-                      position: 'relative'
-                    }}>
-                      <MapPin
-                        size={18}
-                        style={{
-                          position: 'absolute',
-                          left: '14px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          color: '#EE9300',
-                          zIndex: 1
-                        }}
-                      />
-                      <input
-                        style={{
-                          width: '100%',
-                          padding: '14px 14px 14px 44px',
-                          borderRadius: '12px',
-                          border: '2px solid rgba(238, 147, 0, 0.3)',
-                          background: 'rgba(26, 33, 26, 0.98)',
-                          color: 'white',
-                          fontSize: '0.95rem',
-                          outline: 'none',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-                          transition: 'all 0.3s ease'
-                        }}
-                        placeholder="Endereço de destino"
-                        onFocus={(e) => {
-                          e.target.style.borderColor = '#EE9300';
-                          e.target.style.boxShadow = '0 4px 16px rgba(238, 147, 0, 0.4)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = 'rgba(238, 147, 0, 0.3)';
-                          e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-                        }}
-                      />
-                    </div>
-                  </StandaloneSearchBox>
-
-                  <button
-                    onClick={traceRoute}
-                    disabled={!pointA || !pointB}
-                    style={{
-                      padding: '14px 24px',
-                      borderRadius: '12px',
-                      border: 'none',
-                      background: pointA && pointB
-                        ? 'linear-gradient(135deg, #EE9300 0%, #ff9e00 100%)'
-                        : 'rgba(50, 52, 65, 0.8)',
-                      color: 'white',
-                      fontSize: '1rem',
-                      fontWeight: '600',
-                      cursor: pointA && pointB ? 'pointer' : 'not-allowed',
-                      opacity: pointA && pointB ? 1 : 0.5,
-                      boxShadow: pointA && pointB
-                        ? '0 4px 15px rgba(238, 147, 0, 0.3)'
-                        : '0 4px 12px rgba(0, 0, 0, 0.3)',
-                      transition: 'all 0.3s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px'
+                {/* Marcadores para todos os pontos */}
+                {pontos.map((point) => (
+                  <Marker
+                    key={point.id}
+                    position={{ lat: point.lat, lng: point.lng }}
+                    onClick={() => setSelectedPoint(point)}
+                    title={point.title}
+                    icon={{
+                      url: selectedPoint?.id === point.id
+                        ? "http://maps.google.com/mapfiles/ms/icons/green-dot.png"
+                        : "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
                     }}
-                    onMouseOver={(e) => {
-                      if (pointA && pointB) {
-                        e.currentTarget.style.transform = 'translateY(-2px)';
-                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(238, 147, 0, 0.4)';
-                      }
-                    }}
-                    onMouseOut={(e) => {
-                      if (pointA && pointB) {
-                        e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(238, 147, 0, 0.3)';
-                      }
-                    }}
-                  >
-                    <Navigation size={20} />
-                    Traçar Rota
-                  </button>
-                </div>
-
-                {pointA && !response && <Marker position={pointA} />}
-                {pointB && !response && <Marker position={pointB} />}
-
-                {directionsServiceOptions && (
-                  <DirectionsService
-                    options={directionsServiceOptions}
-                    callback={directionsCallback}
+                    animation={selectedPoint?.id === point.id ? window.google.maps.Animation.BOUNCE : null}
                   />
-                )}
-
-                {directionsRendererOptions && (
-                  <DirectionsRenderer options={directionsRendererOptions} />
-                )}
+                ))}
               </GoogleMap>
             </div>
           </LoadScript>
+
+          {/* Dica de uso */}
+          <div style={{
+            marginTop: '16px',
+            padding: '12px 16px',
+            background: 'rgba(0, 163, 53, 0.1)',
+            border: '1px solid rgba(0, 163, 53, 0.3)',
+            borderRadius: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <div style={{ fontSize: '1.5rem' }}>💡</div>
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.9)',
+              fontSize: '0.9rem',
+              margin: '0',
+              lineHeight: '1.5'
+            }}>
+              <strong>Dica:</strong> Use os controles do Google Maps para visualizar rotas, Street View e mais opções de navegação!
+            </p>
+          </div>
         </div>
       </div>
       <Footer />
@@ -496,3 +354,14 @@ const MapPage = () => {
 };
 
 export default MapPage;
+
+// Adicionar estilos responsivos inline
+const style = document.createElement('style');
+style.textContent = `
+  @media (max-width: 768px) {
+    .map-container {
+      padding: 60px 12px 12px !important;
+    }
+  }
+`;
+document.head.appendChild(style);

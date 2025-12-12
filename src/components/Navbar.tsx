@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './style.css';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserProfilePic } from '@/hooks/api';
+import { useUserProfilePic, useUser } from '@/hooks/api';
 import { createApiError } from '@/utils/errorHandler';
 import { showToast } from '@/lib/toast';
 import NotificationBell from './NotificationBell';
@@ -11,11 +11,11 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState("none");
-  const [userPoints, setUserPoints] = useState(0);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // Use React Query hook to get profile picture
+  // Use React Query hooks com cache automático
   const { data: userProfilePic } = useUserProfilePic(user?.id || '');
+  const { data: userData } = useUser(user?.id || '');
 
   const defaultUrl = 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
 
@@ -32,30 +32,7 @@ export default function Navbar() {
 
   const profileUrl = isValidUrl(userProfilePic?.url) ? userProfilePic?.url : defaultUrl;
   const displayName = userProfilePic?.name || user?.name || 'Usuário';
-
-  // Buscar pontos do usuário
-  React.useEffect(() => {
-    const fetchUserPoints = async () => {
-      if (user?.id) {
-        try {
-          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/usuarios/${user.id}`, {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-          });
-          const userData = await response.json();
-          setUserPoints(userData.pontos || 0);
-        } catch (error) {
-          console.error('Erro ao buscar pontos:', error);
-        }
-      }
-    };
-
-    fetchUserPoints();
-    // Atualiza a cada 30 segundos
-    const interval = setInterval(fetchUserPoints, 30000);
-    return () => clearInterval(interval);
-  }, [user?.id]);
+  const userPoints = userData?.pontos || user?.pontos || 0;
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => (prev === "flex" ? "none" : "flex"));

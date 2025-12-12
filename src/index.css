@@ -172,10 +172,6 @@ button:focus-visible {
     font-size: 1.5rem !important;
   }
 
-  .podium {
-    flex-direction: column !important;
-  }
-
   .features-grid {
     grid-template-columns: 1fr !important;
   }
