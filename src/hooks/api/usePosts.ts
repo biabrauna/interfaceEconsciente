@@ -61,17 +61,17 @@ export const usePost = (postId: string) => {
 };
 
 // Hook to get posts by a specific user
-export const useUserPosts = (userId: string) => {
+export const useUserPosts = (userId: string, page: number = 1, limit: number = 10) => {
   return useQuery({
-    queryKey: queryKeys.posts.byUser(userId),
-    queryFn: async (): Promise<Post[]> => {
+    queryKey: [...queryKeys.posts.byUser(userId), page, limit],
+    queryFn: async () => {
       try {
-        const response = await api.get<Post[]>(`/posts/user/${userId}`);
+        const response = await api.get(`/usuarios/${userId}/posts`, {
+          params: { page, limit }
+        });
         return response.data;
       } catch (error) {
-        // If endpoint doesn't exist, try filtering from all posts
-        const allPostsResponse = await api.get<Post[]>('/posts');
-        return allPostsResponse.data.filter(post => post.userId === userId);
+        throw createApiError(error, `Get posts for user ${userId}`);
       }
     },
     enabled: !!userId,

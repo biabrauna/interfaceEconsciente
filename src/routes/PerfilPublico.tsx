@@ -4,9 +4,11 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import FollowButton from "../components/FollowButton";
 import EmptyState from "../components/EmptyState";
+import PostCard from "../components/PostCard";
 import './style.css';
 import { useMe } from "@/hooks/api/useAuth";
 import { useUser, useUserProfilePic } from "@/hooks/api/useUsers";
+import { useUserPosts } from "@/hooks/api/usePosts";
 import { useQuery } from '@tanstack/react-query';
 import api from "../services/api";
 
@@ -46,10 +48,14 @@ export default function PerfilPublico() {
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
+  // Buscar posts do usuário
+  const { data: postsData, isLoading: loadingPosts } = useUserPosts(userId || '', 1, 20);
+
   // Determinar valores a exibir
   const profilePic = userProfilePic?.url || defaultProfilePic;
   const name = userProfilePic?.name || userInfo?.name || '';
   const loading = loadingUser || loadingConquistas;
+  const userPosts = postsData?.data || [];
 
   if (loading) {
     return (
@@ -130,6 +136,35 @@ export default function PerfilPublico() {
           <p className="bio-text">
             {userInfo.biografia || "Usuário consciente fazendo a diferença! 🌱"}
           </p>
+        </div>
+
+        <div className="profile-achievements">
+          <h3 className="achievements-title">
+            <span>📸</span> Posts
+          </h3>
+
+          {loadingPosts ? (
+            <div style={{ textAlign: 'center', padding: '20px', color: 'rgba(255, 255, 255, 0.6)' }}>
+              ⏳ Carregando posts...
+            </div>
+          ) : userPosts.length > 0 ? (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '1.5rem',
+              marginTop: '1rem'
+            }}>
+              {userPosts.map((post: any) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon="📸"
+              title="Nenhum post ainda"
+              description={`${name} ainda não compartilhou nenhum post.`}
+            />
+          )}
         </div>
 
         <div className="profile-achievements">
