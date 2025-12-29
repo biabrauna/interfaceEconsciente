@@ -9,6 +9,7 @@ export function useComentariosByPost(postId: string) {
     queryFn: () => comentariosService.getByPost(postId),
     enabled: !!postId,
     staleTime: 30000, // 30 segundos
+    refetchInterval: 10000, // Atualiza a cada 10 segundos para comentários em tempo real
   });
 }
 

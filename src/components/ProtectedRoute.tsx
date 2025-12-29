@@ -1,7 +1,8 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ProtectedRouteProps } from '@/types';
+import { OnboardingGuard } from './OnboardingGuard';
 
 const LoadingSpinner: React.FC = () => (
   <div style={{
@@ -34,6 +35,7 @@ const LoadingSpinner: React.FC = () => (
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return <LoadingSpinner />;
@@ -41,6 +43,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!user) {
     return <Navigate to="/" replace />;
+  }
+
+  // Routes that don't require onboarding completion
+  const exemptRoutes = ['/EditarPerfil', '/Perfil'];
+  const requiresOnboarding = !exemptRoutes.includes(location.pathname);
+
+  if (requiresOnboarding) {
+    return <OnboardingGuard>{children}</OnboardingGuard>;
   }
 
   return <>{children}</>;

@@ -10,30 +10,23 @@ export default function Onboarding() {
   const { data: onboardingStatus, isLoading } = useOnboardingStatus();
 
   useEffect(() => {
-    // Verifica localStorage para não mostrar novamente
-    const onboardingShown = localStorage.getItem('onboarding_shown');
-    const fromOnboarding = sessionStorage.getItem('from_onboarding');
-
     if (!isLoading && onboardingStatus) {
-      // Se já completou o onboarding, limpa localStorage e não mostra mais
+      // Se já completou o onboarding, não mostra
       if (onboardingStatus.completed) {
-        localStorage.removeItem('onboarding_shown');
         return;
       }
 
-      // Se veio do onboarding (voltou após completar ação), sempre mostra
-      if (fromOnboarding === 'true') {
-        setIsVisible(true);
-        sessionStorage.removeItem('from_onboarding'); // Limpa a flag
-        return;
+      // Atualiza step baseado no progresso
+      const steps = onboardingStatus.steps;
+      if (!steps.profilePic && !steps.bio && !steps.firstChallenge) {
+        setCurrentStep(0);
+      } else if (steps.profilePic && !steps.bio) {
+        setCurrentStep(2);
+      } else if (steps.profilePic && steps.bio && !steps.firstChallenge) {
+        setCurrentStep(3);
       }
 
-      // Se foi pulado antes, não mostra
-      if (onboardingShown === 'true') {
-        return;
-      }
-
-      // Mostra o onboarding pela primeira vez
+      // Sempre mostra o onboarding se não estiver completo
       setIsVisible(true);
     }
   }, [isLoading, onboardingStatus]);
@@ -81,8 +74,6 @@ export default function Onboarding() {
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else {
-      handleClose();
     }
   };
 
@@ -92,24 +83,9 @@ export default function Onboarding() {
     }
   };
 
-  const handleClose = () => {
-    localStorage.setItem('onboarding_shown', 'true');
-    setIsVisible(false);
-  };
-
-  const handleSkip = () => {
-    handleClose();
-  };
-
   const handleAction = () => {
     const step = steps[currentStep];
     if (step.action) {
-      // Marcar que veio do onboarding para TODAS as ações
-      sessionStorage.setItem('from_onboarding', 'true');
-      sessionStorage.setItem('onboarding_current_step', currentStep.toString());
-
-      // Não fechar o onboarding, apenas ocultar temporariamente
-      setIsVisible(false);
       step.action();
     } else {
       handleNext();
@@ -122,11 +98,6 @@ export default function Onboarding() {
   return (
     <div className="onboarding-overlay">
       <div className="onboarding-modal">
-        {/* Botão de fechar */}
-        <button className="onboarding-close" onClick={handleClose} aria-label="Fechar">
-          ✕
-        </button>
-
         {/* Barra de progresso */}
         <div className="onboarding-progress-container">
           <div className="onboarding-progress-bar" style={{ width: `${progress}%` }} />
@@ -158,14 +129,7 @@ export default function Onboarding() {
 
         {/* Botões de navegação */}
         <div className="onboarding-actions">
-          <button
-            className="onboarding-btn onboarding-btn-skip"
-            onClick={handleSkip}
-          >
-            Pular
-          </button>
-
-          <div className="onboarding-nav-buttons">
+          <div className="onboarding-nav-buttons" style={{ width: '100%', justifyContent: 'center' }}>
             {currentStep > 0 && (
               <button
                 className="onboarding-btn onboarding-btn-secondary"

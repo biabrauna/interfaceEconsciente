@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { showToast } from '@/lib/toast';
 import { useMe } from '@/hooks/api/useAuth';
-import { useUser, useUpdateUser } from '@/hooks/api/useUsers';
+import { useUser, useUpdateUser, useUploadProfilePic } from '@/hooks/api/useUsers';
 import './style.css';
 
 export default function EditarPerfil() {
@@ -15,6 +15,7 @@ export default function EditarPerfil() {
   const { data: currentUser } = useMe();
   const { data: userData, isLoading: loadingUserData } = useUser(currentUser?.id || '');
   const updateUserMutation = useUpdateUser();
+  const uploadProfilePicMutation = useUploadProfilePic();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -22,6 +23,9 @@ export default function EditarPerfil() {
     dataNascimento: '',
     biografia: '',
   });
+
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+  const [profilePicPreview, setProfilePicPreview] = useState<string>('');
 
   // Preencher form quando os dados forem carregados do cache ou da API
   useEffect(() => {
@@ -39,6 +43,32 @@ export default function EditarPerfil() {
     }
   }, [userData]);
 
+  const handleProfilePicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfilePicFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'econsciente');
+
+    const response = await fetch('https://api.cloudinary.com/v1_1/dnulz0tix/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+    return data.secure_url;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess(false);
@@ -49,6 +79,17 @@ export default function EditarPerfil() {
     }
 
     try {
+      // Upload profile picture if selected
+      if (profilePicFile) {
+        const url = await uploadToCloudinary(profilePicFile);
+        await uploadProfilePicMutation.mutateAsync({
+          userId: currentUser.id,
+          url,
+          name: currentUser.name || 'User',
+        });
+      }
+
+      // Update profile
       await updateUserMutation.mutateAsync({
         id: currentUser.id,
         ...formData,
@@ -57,15 +98,8 @@ export default function EditarPerfil() {
       setSuccess(true);
       showToast.success('Perfil atualizado com sucesso!');
 
-      // Verificar se veio do onboarding
-      const fromOnboarding = sessionStorage.getItem('from_onboarding');
-
       setTimeout(() => {
-        if (fromOnboarding === 'true') {
-          navigate('/Home');
-        } else {
-          navigate('/Perfil');
-        }
+        navigate('/Home');
       }, 1500);
     } catch (error: any) {
       console.error('Erro ao atualizar perfil:', error);
@@ -117,6 +151,42 @@ export default function EditarPerfil() {
           </div>
 
           <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
+                Foto de Perfil
+              </label>
+              {profilePicPreview && (
+                <div style={{ marginBottom: '10px', textAlign: 'center' }}>
+                  <img
+                    src={profilePicPreview}
+                    alt="Preview"
+                    style={{
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '50%',
+                      objectFit: 'cover',
+                      border: '3px solid #4CAF50',
+                    }}
+                  />
+                </div>
+              )}
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleProfilePicChange}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid #ddd',
+                  fontSize: '14px',
+                }}
+              />
+              <small style={{ color: '#666', fontSize: '12px' }}>
+                Adicione uma foto de perfil e ganhe +100 pontos! 📸
+              </small>
+            </div>
+
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600' }}>
                 Nome
@@ -197,6 +267,9 @@ export default function EditarPerfil() {
                   resize: 'vertical',
                 }}
               />
+              <small style={{ color: '#666', fontSize: '12px' }}>
+                Adicione uma biografia e ganhe +50 pontos! ✍️
+              </small>
             </div>
 
             {success && (
