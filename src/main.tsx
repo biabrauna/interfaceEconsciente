@@ -15,6 +15,7 @@ import PerfilPublico from '@/routes/PerfilPublico';
 import EditarPerfil from '@/routes/EditarPerfil';
 import Ranking from '@/routes/Ranking';
 import Posts from '@/routes/Posts';
+import Feed from '@/routes/Feed';
 import Feedback from '@/routes/Feedback';
 import Desafios from '@/routes/Desafios';
 import NotFound from '@/routes/NotFound';
@@ -152,6 +153,16 @@ const router = createBrowserRouter([
           <ErrorBoundary>
             <ProtectedRoute>
               <Posts />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: "feed",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <Feed />
             </ProtectedRoute>
           </ErrorBoundary>
         ),

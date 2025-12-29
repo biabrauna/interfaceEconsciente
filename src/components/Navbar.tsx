@@ -116,7 +116,7 @@ export default function Navbar() {
         <div className="menu-list" style={{ display: isMenuOpen }}>
           <Link to="/Home"><li>Home</li></Link>
           <div className="bar" />
-          <Link to="/Posts"><li>Feed de Posts</li></Link>
+          <Link to="/feed"><li>Feed de Posts</li></Link>
           <div className="bar" />
           <Link to="/EditarPerfil"><li>Editar Perfil</li></Link>
           <div className="bar" />

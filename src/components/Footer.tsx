@@ -12,7 +12,7 @@ export default function Footer() {
             <div className="nav-responsive-footer">
                 <div className="menu-list-footer">
                     <div className="circle"><Link to="/Home" aria-label="Ir para Home"><li><FaHome /></li></Link></div>
-                    <div className="circle"><Link to="/Posts" aria-label="Ver Posts"><li><FaCamera /> </li></Link></div>
+                    <div className="circle"><Link to="/feed" aria-label="Ver Posts"><li><FaCamera /> </li></Link></div>
                     <div className="circle"><Link to="/Localizacao" aria-label="Ver Localização"><li><FaMapMarkerAlt /></li></Link></div>
                     <div className="circle"><Link to="/Ranking" aria-label="Ver Ranking"><li><FontAwesomeIcon icon={faTrophy} size="xs" /></li></Link></div>
                 </div>
