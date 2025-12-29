@@ -16,6 +16,7 @@ import EditarPerfil from '@/routes/EditarPerfil';
 import Ranking from '@/routes/Ranking';
 import Posts from '@/routes/Posts';
 import Feedback from '@/routes/Feedback';
+import Desafios from '@/routes/Desafios';
 import NotFound from '@/routes/NotFound';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import Layout from '@/components/Layout';
@@ -161,6 +162,16 @@ const router = createBrowserRouter([
           <ErrorBoundary>
             <ProtectedRoute>
               <Feedback />
+            </ProtectedRoute>
+          </ErrorBoundary>
+        ),
+      },
+      {
+        path: "Desafios",
+        element: (
+          <ErrorBoundary>
+            <ProtectedRoute>
+              <Desafios />
             </ProtectedRoute>
           </ErrorBoundary>
         ),
