@@ -15,6 +15,9 @@ export interface Post {
     id: string;
     name: string;
   };
+  userLikes?: {
+    userId: string;
+  }[];
 }
 
 // Interface for creating a post
@@ -177,6 +180,26 @@ export const useDeletePost = () => {
   });
 };
 
+// Hook to get feed for a specific user
+export const useFeed = (userId: string, page: number = 1, limit: number = 10) => {
+  return useQuery({
+    queryKey: [...queryKeys.posts.all, 'feed', userId, page, limit],
+    queryFn: async () => {
+      try {
+        const response = await api.get(`/posts/feed/${userId}`, {
+          params: { page, limit }
+        });
+        return response.data;
+      } catch (error) {
+        throw createApiError(error, `Get feed for user ${userId}`);
+      }
+    },
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+};
+
 // Hook to like a post
 export const useLikePost = () => {
   const queryClient = useQueryClient();
@@ -191,7 +214,38 @@ export const useLikePost = () => {
       }
     },
     onSuccess: (updatedPost) => {
-      // Update in all posts
+      // Update in all posts and feed
+      queryClient.setQueryData(queryKeys.posts.all, (old: any) => {
+        if (!old?.data) return old;
+        return {
+          ...old,
+          data: old.data.map((post: Post) =>
+            post.id === updatedPost.id ? updatedPost : post
+          ),
+        };
+      });
+
+      queryClient.setQueryData(queryKeys.posts.detail(updatedPost.id), updatedPost);
+      invalidateQueries.posts();
+    },
+  });
+};
+
+// Hook to unlike a post
+export const useUnlikePost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ postId, userId }: { postId: string; userId: string }) => {
+      try {
+        const response = await api.patch(`/posts/${postId}/unlike`, { userId });
+        return response.data;
+      } catch (error) {
+        throw createApiError(error, `Unlike post ${postId}`);
+      }
+    },
+    onSuccess: (updatedPost) => {
+      // Update in all posts and feed
       queryClient.setQueryData(queryKeys.posts.all, (old: any) => {
         if (!old?.data) return old;
         return {

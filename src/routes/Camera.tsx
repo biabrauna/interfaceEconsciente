@@ -1,8 +1,11 @@
+import { useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ImageUploader from "@/components/ImageUploader";
 
 export default function Camera() {
+  const { desafioId } = useParams<{ desafioId?: string }>();
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -11,7 +14,7 @@ export default function Camera() {
       flexDirection: 'column'
     }}>
       <Navbar />
-      <ImageUploader />
+      <ImageUploader desafioId={desafioId} />
       <Footer />
     </div>
   );

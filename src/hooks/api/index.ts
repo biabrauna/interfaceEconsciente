@@ -10,5 +10,8 @@ export * from './useDesafios';
 // Posts hooks
 export * from './usePosts';
 
+// Vision hooks
+export * from './useVision';
+
 // Re-export query client utilities
 export { queryClient, queryKeys, invalidateQueries } from '@/lib/queryClient';

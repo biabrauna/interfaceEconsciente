@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PostCard from '../components/PostCard';
-import { usePosts, useOptimisticLike } from '@/hooks/api/usePosts';
+import { useFeed, useLikePost, useUnlikePost } from '@/hooks/api/usePosts';
 import { useAuth } from '@/hooks/useAuth';
 import './Posts.css';
 
@@ -13,12 +13,18 @@ export default function Posts() {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  const { data, isLoading, isError, error } = usePosts(page, limit);
-  const likeMutation = useOptimisticLike();
+  const { data, isLoading, isError, error } = useFeed(user?.id || '', page, limit);
+  const likeMutation = useLikePost();
+  const unlikeMutation = useUnlikePost();
 
-  const handleLike = (postId: string) => {
+  const handleLike = (postId: string, isLiked: boolean) => {
     if (!user?.id) return;
-    likeMutation.mutate({ postId, userId: user.id, increment: 1 });
+
+    if (isLiked) {
+      unlikeMutation.mutate({ postId, userId: user.id });
+    } else {
+      likeMutation.mutate({ postId, userId: user.id });
+    }
   };
 
   const handleNextPage = () => {

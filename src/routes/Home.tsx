@@ -1,7 +1,7 @@
 import React from 'react';
 import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 import Sideone from '@/components/Sideone';
+import Footer from '@/components/Footer';
 import './style.css';
 
 const Home: React.FC = () => {

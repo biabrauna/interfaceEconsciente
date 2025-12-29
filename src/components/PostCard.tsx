@@ -1,14 +1,16 @@
 import { Post } from '@/hooks/api/usePosts';
 import { useUserProfilePic } from '@/hooks/api';
+import { useAuth } from '@/hooks/useAuth';
 import ComentariosSection from './ComentariosSection';
 import './PostCard.css';
 
 interface PostCardProps {
   post: Post;
-  onLike?: (postId: string) => void;
+  onLike?: (postId: string, isLiked: boolean) => void;
 }
 
 export default function PostCard({ post, onLike }: PostCardProps) {
+  const { user } = useAuth();
   const { data: userProfilePic } = useUserProfilePic(post.userId);
 
   const defaultUrl = 'https://res.cloudinary.com/dnulz0tix/image/upload/v1733802865/i6kojbxaeh39jcjqo3yh.png';
@@ -27,9 +29,12 @@ export default function PostCard({ post, onLike }: PostCardProps) {
   const postImageUrl = isValidUrl(post.url) ? post.url : defaultUrl;
   const userName = post.user?.name || userProfilePic?.name || 'Usuário';
 
+  // Check if current user has liked this post
+  const isLiked = post.userLikes?.some(like => like.userId === user?.id) || false;
+
   const handleLike = () => {
     if (onLike) {
-      onLike(post.id);
+      onLike(post.id, isLiked);
     }
   };
 
@@ -86,11 +91,11 @@ export default function PostCard({ post, onLike }: PostCardProps) {
 
       <div className="post-actions">
         <button
-          className="post-like-button"
+          className={`post-like-button ${isLiked ? 'liked' : ''}`}
           onClick={handleLike}
-          aria-label="Curtir"
+          aria-label={isLiked ? 'Descurtir' : 'Curtir'}
         >
-          <span className="like-icon">❤️</span>
+          <span className="like-icon">{isLiked ? '❤️' : '🤍'}</span>
           <span className="like-count">{post.likes}</span>
         </button>
       </div>

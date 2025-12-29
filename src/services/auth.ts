@@ -42,12 +42,10 @@ export class AuthService {
 
   static async logout(): Promise<void> {
     try {
-      localStorage.removeItem('accessToken');
+      localStorage.removeItem('token');
     } catch (error) {
       // Log error but don't throw - we still want to clear local storage
       createApiError(error, 'Logout');
-    } finally {
-      localStorage.removeItem('token');
     }
   }
 

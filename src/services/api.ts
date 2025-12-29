@@ -118,6 +118,22 @@ class ApiService {
       throw createApiError(error, `DELETE ${url}`);
     }
   }
+
+  async patch<T>(
+    url: string,
+    data?: unknown,
+    config?: AxiosRequestConfig
+  ): Promise<ApiResponse<T>> {
+    try {
+      const response = await this.api.patch<T>(url, data, config);
+      return {
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      throw createApiError(error, `PATCH ${url}`);
+    }
+  }
 }
 
 const api = new ApiService();

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import uploadImage from '@/assets/images/upload (2).png';
-import { useAuthState, useCreatePost } from '@/hooks/api';
+import { useAuthState, useCreatePost, useVerifyChallenge, useDesafio } from '@/hooks/api';
 import { createApiError } from '@/utils/errorHandler';
 import { showToast } from '@/lib/toast';
 
@@ -9,7 +9,11 @@ interface CloudinaryResponse {
   url: string;
 }
 
-const ImageUploader: React.FC = () => {
+interface ImageUploaderProps {
+  desafioId?: string;
+}
+
+const ImageUploader: React.FC<ImageUploaderProps> = ({ desafioId }) => {
   const [imageUrl, setImageUrl] = useState<string>(uploadImage);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [url, setUrl] = useState<string>('');
@@ -18,6 +22,8 @@ const ImageUploader: React.FC = () => {
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const { user } = useAuthState();
   const createPostMutation = useCreatePost();
+  const verifyChallengesMutation = useVerifyChallenge();
+  const { data: desafio } = useDesafio(desafioId || '');
 
   // Validar URL para evitar erros
   const isValidImageUrl = (testUrl: string): boolean => {
@@ -34,30 +40,58 @@ const ImageUploader: React.FC = () => {
 
   const handlePostarFoto = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    
+
     if (!url || !user?.id) {
       setAlertMessage('Dados incompletos para postar a foto.');
       setAlertType('error');
       setTimeout(() => setAlertMessage(''), 3000);
       return;
     }
-    
+
     try {
-      await createPostMutation.mutateAsync({
-        url: url,
-        userId: user.id,
-        likes: 0
-      });
-      const successMsg = 'Foto postada com sucesso! A foto irá para análise e, em breve, seus pontos serão computados.';
-      setAlertMessage(successMsg);
-      setAlertType('success');
-      showToast.success('Foto postada com sucesso! 🎉');
+      // Se tem desafioId, verifica o desafio antes de criar o post
+      if (desafioId && desafio) {
+        const verificationResult = await verifyChallengesMutation.mutateAsync({
+          imageUrl: url,
+          challengeDescription: desafio.desafios,
+          challengeId: desafioId,
+          userId: user.id,
+          useSimulation: false,
+        });
+
+        if (verificationResult.success && verificationResult.confidence >= 0.7) {
+          // Desafio concluído com sucesso
+          const points = verificationResult.pointsAwarded || 0;
+          const successMsg = `Desafio concluído com sucesso! Você ganhou ${points} pontos! 🎉\n\n${verificationResult.analysis}`;
+          setAlertMessage(successMsg);
+          setAlertType('success');
+          showToast.success(`Parabéns! +${points} pontos! 🎉`);
+        } else {
+          // Desafio não atende aos critérios
+          const failMsg = `A imagem não atende aos critérios do desafio.\n\n${verificationResult.analysis}`;
+          setAlertMessage(failMsg);
+          setAlertType('error');
+          showToast.error('Desafio não concluído. Tente novamente.');
+        }
+      } else {
+        // Sem desafio, apenas cria o post
+        await createPostMutation.mutateAsync({
+          url: url,
+          userId: user.id,
+          likes: 0
+        });
+        const successMsg = 'Foto postada com sucesso! A foto irá para análise e, em breve, seus pontos serão computados.';
+        setAlertMessage(successMsg);
+        setAlertType('success');
+        showToast.success('Foto postada com sucesso! 🎉');
+      }
+
       setUrl(''); // Reset form
       setImageUrl(uploadImage);
       setTimeout(() => setAlertMessage(''), 5000);
     } catch (error) {
-      const appError = createApiError(error, 'Post photo');
-      setAlertMessage(appError.message || 'Erro ao postar a foto. Tente novamente.');
+      const appError = createApiError(error, desafioId ? 'Verify challenge' : 'Post photo');
+      setAlertMessage(appError.message || 'Erro ao processar a foto. Tente novamente.');
       setAlertType('error');
       setTimeout(() => setAlertMessage(''), 3000);
     }
@@ -172,7 +206,7 @@ const ImageUploader: React.FC = () => {
             letterSpacing: '-0.02em',
             textShadow: '0 2px 10px rgba(0, 0, 0, 0.3)'
           }}>
-            Registrar Conquista
+            {desafioId ? 'Completar Desafio' : 'Registrar Conquista'}
           </h1>
 
           <p style={{
@@ -182,7 +216,7 @@ const ImageUploader: React.FC = () => {
             fontWeight: '500',
             lineHeight: '1.5'
           }}>
-            Compartilhe sua atitude sustentável!
+            {desafioId && desafio ? desafio.desafios : 'Compartilhe sua atitude sustentável!'}
           </p>
 
           <div style={{
@@ -254,7 +288,7 @@ const ImageUploader: React.FC = () => {
           <form onSubmit={handlePostarFoto}>
             <button
               type="submit"
-              disabled={!url || isUploading || createPostMutation.isPending}
+              disabled={!url || isUploading || createPostMutation.isPending || verifyChallengesMutation.isPending}
               style={{
                 width: '100%',
                 padding: '16px 24px',
@@ -290,7 +324,7 @@ const ImageUploader: React.FC = () => {
                 }
               }}
             >
-              {isUploading ? (
+              {isUploading || verifyChallengesMutation.isPending ? (
                 <>
                   <span style={{
                     display: 'inline-block',
@@ -301,10 +335,10 @@ const ImageUploader: React.FC = () => {
                     borderRadius: '50%',
                     animation: 'spin 0.8s linear infinite'
                   }}></span>
-                  Processando...
+                  {verifyChallengesMutation.isPending ? 'Verificando desafio...' : 'Processando...'}
                 </>
               ) : (
-                <>🚀 Postar Foto</>
+                <>🚀 {desafioId ? 'Completar Desafio' : 'Postar Foto'}</>
               )}
             </button>
           </form>
