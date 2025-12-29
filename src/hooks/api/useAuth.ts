@@ -88,40 +88,72 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: async (): Promise<void> => {
       try {
+        // AuthService.logout() agora chama o backend para invalidar sessões
         await AuthService.logout();
+        console.log('[useLogout] Logout realizado - sessões invalidadas no backend');
       } catch (error) {
         // Log error but still proceed with logout
+        console.error('[useLogout] Erro ao fazer logout:', error);
         createApiError(error, 'Logout');
       }
     },
     onSuccess: () => {
+      console.log('[useLogout] Limpando cache local e queries do React Query');
       // Clear all cached data
       queryClient.clear();
       // Remove user from cache
       queryClient.removeQueries({ queryKey: queryKeys.auth.me });
     },
     onError: (error) => {
-      console.error('Logout mutation failed:', error);
+      console.error('[useLogout] Logout mutation failed:', error);
       // Still clear cache even if logout fails
       queryClient.clear();
     },
   });
 };
 
-// Hook to check if user is authenticated
+// Hook to check if user is authenticated (token + user data synced)
 export const useIsAuthenticated = (): boolean => {
   const { data: user } = useMe();
-  return !!user && !!AuthService.getToken();
+  const hasToken = !!AuthService.getToken();
+  const hasUser = !!user;
+
+  // Verifica sincronização: deve ter ambos ou nenhum
+  if (hasToken && !hasUser) {
+    console.warn('[useIsAuthenticated] Token existe mas usuário não carregado');
+  } else if (!hasToken && hasUser) {
+    console.warn('[useIsAuthenticated] Usuário em cache mas token ausente - limpando cache');
+    // Estado inconsistente, limpar
+    AuthService.clearToken();
+  }
+
+  return hasToken && hasUser;
 };
 
-// Hook to get auth state with loading
+// Hook to get auth state with loading and synchronization check
 export const useAuthState = () => {
   const { data: user, isLoading, error } = useMe();
-  
+  const hasToken = !!AuthService.getToken();
+  const hasUser = !!user;
+
+  // Verifica sincronização entre token e dados do usuário
+  const isAuthenticated = hasToken && hasUser;
+
+  // Log de debug para detectar problemas de sincronização
+  if (hasToken !== hasUser && !isLoading) {
+    console.warn('[useAuthState] Estado de autenticação inconsistente:', {
+      hasToken,
+      hasUser,
+      isLoading
+    });
+  }
+
   return {
     user,
     isLoading,
     error: error ? createApiError(error, 'Auth state') : null,
-    isAuthenticated: !!user && !!AuthService.getToken(),
+    isAuthenticated,
+    hasToken,
+    isSynced: hasToken === hasUser, // Indica se token e user estão sincronizados
   };
 };

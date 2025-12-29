@@ -1,7 +1,7 @@
 import api from './api';
 import { AuthResponse, LoginCredentials, RegisterData, User } from '@/types';
 import { createApiError } from '@/utils/errorHandler';
-import { useNavigate } from 'react-router-dom';
+import { TokenManager } from '@/utils/tokenManager';
 
 export class AuthService {
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -10,23 +10,20 @@ export class AuthService {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
 
       if (response.data.access_token) {
-        console.log('[AuthService] Token recebido, salvando no localStorage...');
-        localStorage.setItem('token', response.data.access_token);
-
-        // Verificar se foi salvo corretamente
-        const savedToken = localStorage.getItem('token');
-        console.log('[AuthService] Token salvo:', {
-          saved: !!savedToken,
-          matches: savedToken === response.data.access_token,
-          tokenPreview: savedToken ? `${savedToken.substring(0, 20)}...` : 'none'
-        });
+        console.log('[AuthService] Token JWT recebido do backend');
+        // Armazena token JWT usando TokenManager
+        // Backend gerencia sessões via banco de dados usando o userId do token
+        TokenManager.setToken(response.data.access_token);
       } else {
         console.warn('[AuthService] Nenhum token recebido no response');
+        throw new Error('Token de autenticação não recebido');
       }
 
       return response.data;
     } catch (error) {
       console.error('[AuthService] Erro no login:', error);
+      // Limpa qualquer token existente em caso de erro
+      this.clearToken();
       throw createApiError(error, 'Login');
     }
   }
@@ -42,10 +39,16 @@ export class AuthService {
 
   static async logout(): Promise<void> {
     try {
-      localStorage.removeItem('token');
+      console.log('[AuthService] Iniciando logout...');
+      // Chamar endpoint de logout no backend para invalidar sessões no banco
+      await api.post('/auth/logout');
+      console.log('[AuthService] Sessões invalidadas no backend');
     } catch (error) {
       // Log error but don't throw - we still want to clear local storage
-      createApiError(error, 'Logout');
+      console.error('[AuthService] Erro ao fazer logout no backend:', error);
+    } finally {
+      // Sempre limpa o token local usando TokenManager
+      TokenManager.clearToken();
     }
   }
 
@@ -59,15 +62,15 @@ export class AuthService {
   }
 
   static getToken(): string | null {
-    return localStorage.getItem('token');
+    return TokenManager.getToken();
   }
 
   static isAuthenticated(): boolean {
-    return !!this.getToken();
+    return TokenManager.isValid();
   }
 
   static clearToken(): void {
-    localStorage.removeItem('token');
+    TokenManager.clearToken();
   }
 }
 

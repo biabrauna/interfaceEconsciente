@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { createApiError } from '@/utils/errorHandler';
 import { ApiResponse } from '@/types';
+import { TokenManager } from '@/utils/tokenManager';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3002';
 
@@ -21,41 +22,65 @@ class ApiService {
   }
 
   private setupInterceptors(): void {
-    // Request interceptor
+    // Request interceptor - Adiciona JWT token aos headers
     this.api.interceptors.request.use(
       (config) => {
-        const token = localStorage.getItem('token');
-        console.log('[API Interceptor] Request:', {
-          url: config.url,
-          method: config.method,
-          hasToken: !!token,
-          tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
-        });
+        const token = TokenManager.getToken();
 
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          // Verifica se token não está expirado antes de adicionar
+          if (!TokenManager.isTokenExpired()) {
+            config.headers.Authorization = `Bearer ${token}`;
+            console.log('[API Interceptor] Token JWT adicionado ao header Authorization');
+          } else {
+            console.warn('[API Interceptor] Token JWT expirado, não adicionado ao header');
+            TokenManager.clearToken();
+          }
+        } else {
+          console.log('[API Interceptor] Nenhum token JWT disponível');
         }
+
+        console.log('[API Interceptor] Request:', {
+          url: config.url,
+          method: config.method?.toUpperCase(),
+          hasToken: !!token && !TokenManager.isTokenExpired(),
+          withCredentials: config.withCredentials
+        });
+
         return config;
       },
       (error) => Promise.reject(createApiError(error, 'Request setup'))
     );
 
-    // Response interceptor
+    // Response interceptor - Gerencia erros de autenticação
     this.api.interceptors.response.use(
-      (response: AxiosResponse) => response,
+      (response: AxiosResponse) => {
+        console.log('[API Interceptor] Response:', {
+          url: response.config.url,
+          status: response.status,
+          hasData: !!response.data
+        });
+        return response;
+      },
       (error) => {
         const apiError = createApiError(error, 'API Response');
 
-        // Handle unauthorized access
+        // Handle unauthorized access - Limpa token JWT e redireciona
         if (apiError.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/';
+          console.warn('[API Interceptor] Token JWT inválido ou expirado (401)');
+          console.warn('[API Interceptor] Limpando autenticação local...');
+          TokenManager.clearToken();
+          // Backend invalida sessões automaticamente quando token é inválido
+          // Redireciona apenas se não estiver na página de login
+          if (!window.location.pathname.includes('/Login') && !window.location.pathname.includes('/Cadastrar')) {
+            console.warn('[API Interceptor] Redirecionando para login...');
+            window.location.href = '/';
+          }
         }
 
         // Handle rate limit (429)
         if (apiError.status === 429) {
-          console.warn('⚠️ Rate limit atingido. Aguarde alguns segundos antes de tentar novamente.');
-          // Você pode adicionar uma notificação visual aqui
+          console.warn('[API Interceptor] Rate limit atingido. Aguarde alguns segundos.');
         }
 
         return Promise.reject(apiError);
