@@ -12,6 +12,14 @@ import { useUserPosts } from "@/hooks/api/usePosts";
 import { useQuery } from '@tanstack/react-query';
 import api from "../services/api";
 
+interface Conquista {
+  id: string;
+  nome: string;
+  descricao: string;
+  icone: string;
+  desbloqueada: boolean;
+}
+
 export default function PerfilPublico() {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
@@ -34,11 +42,11 @@ export default function PerfilPublico() {
   const { data: userProfilePic } = useUserProfilePic(userId || '');
 
   // Buscar conquistas do usuário com React Query
-  const { data: conquistas = [], isLoading: loadingConquistas } = useQuery({
+  const { data: conquistas = [], isLoading: loadingConquistas } = useQuery<Conquista[]>({
     queryKey: ['conquistas', 'user', userId],
-    queryFn: async () => {
+    queryFn: async (): Promise<Conquista[]> => {
       try {
-        const response = await api.get(`/conquistas/user/${userId}`);
+        const response = await api.get<Conquista[]>(`/conquistas/user/${userId}`);
         return response.data || [];
       } catch (error) {
         return [];
@@ -56,6 +64,11 @@ export default function PerfilPublico() {
   const name = userProfilePic?.name || userInfo?.name || '';
   const loading = loadingUser || loadingConquistas;
   const userPosts = postsData?.data || [];
+
+  // Contadores com valores padrão seguros
+  const seguidoresCount = userInfo?.seguidores || 0;
+  const seguindoCount = userInfo?.seguindo || 0;
+  const pontosCount = userInfo?.pontos || 0;
 
   if (loading) {
     return (
@@ -112,17 +125,17 @@ export default function PerfilPublico() {
           <div className="profile-stats-grid">
             <div className="stat-card">
               <div className="stat-icon">👥</div>
-              <div className="stat-value">{userInfo.seguidores || 0}</div>
+              <div className="stat-value">{seguidoresCount}</div>
               <div className="stat-label">Seguidores</div>
             </div>
             <div className="stat-card">
               <div className="stat-icon">🤝</div>
-              <div className="stat-value">{userInfo.seguindo || 0}</div>
+              <div className="stat-value">{seguindoCount}</div>
               <div className="stat-label">Seguindo</div>
             </div>
             <div className="stat-card stat-card-highlight">
               <div className="stat-icon">⭐</div>
-              <div className="stat-value">{userInfo.pontos || 0}</div>
+              <div className="stat-value">{pontosCount}</div>
               <div className="stat-label">Pontos</div>
             </div>
           </div>
@@ -134,7 +147,7 @@ export default function PerfilPublico() {
             <h3 className="bio-title">Sobre</h3>
           </div>
           <p className="bio-text">
-            {userInfo.biografia || "Usuário consciente fazendo a diferença! 🌱"}
+            {userInfo?.biografia || "Usuário consciente fazendo a diferença! 🌱"}
           </p>
         </div>
 

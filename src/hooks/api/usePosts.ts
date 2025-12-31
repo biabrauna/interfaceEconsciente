@@ -63,13 +63,26 @@ export const usePost = (postId: string) => {
   });
 };
 
+// Interface for paginated posts response
+export interface PaginatedPostsResponse {
+  data: Post[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
 // Hook to get posts by a specific user
 export const useUserPosts = (userId: string, page: number = 1, limit: number = 10) => {
-  return useQuery({
+  return useQuery<PaginatedPostsResponse>({
     queryKey: [...queryKeys.posts.byUser(userId), page, limit],
     queryFn: async () => {
       try {
-        const response = await api.get(`/usuarios/${userId}/posts`, {
+        const response = await api.get<PaginatedPostsResponse>(`/usuarios/${userId}/posts`, {
           params: { page, limit }
         });
         return response.data;
